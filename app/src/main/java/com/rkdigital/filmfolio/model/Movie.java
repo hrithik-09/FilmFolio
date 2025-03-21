@@ -1,10 +1,18 @@
 package com.rkdigital.filmfolio.model;
+import android.widget.ImageView;
+
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.databinding.BindingAdapter;
+
 import java.util.List;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.rkdigital.filmfolio.BR;
 
-public class Movie {
+public class Movie extends BaseObservable {
     @SerializedName("adult")
     @Expose
     private Boolean adult;
@@ -47,28 +55,52 @@ public class Movie {
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
+
+    @BindingAdapter({"posterPath"})
+    public static void loadImage(ImageView imageView, String imageUrl){
+        // Basic Url: "https://image.tmdb.org/t/p/w500/"
+        String imagePath = "https://image.tmdb.org/t/p/w500/"+imageUrl;
+
+        Glide.with(imageView.getContext())
+                .load(imagePath)
+                .into(imageView);
+    }
     public Boolean getAdult() {return adult;}
     public void setAdult(Boolean adult) {this.adult = adult;}
     public String getBackdropPath() {return backdropPath;}
     public void setBackdropPath(String backdropPath) {this.backdropPath = backdropPath;}
     public List<Integer> getGenreIds() {return genreIds;}
     public void setGenreIds(List<Integer> genreIds) {this.genreIds = genreIds;}
+    @Bindable
     public Integer getId() {return id;}
     public void setId(Integer id) {this.id = id;}
     public String getOriginalLanguage() {return originalLanguage;}
     public void setOriginalLanguage(String originalLanguage) {this.originalLanguage = originalLanguage;}
-    public String getOriginalTitle() {return originalTitle;}
-    public void setOriginalTitle(String originalTitle) {this.originalTitle = originalTitle;}
+//    public String getOriginalTitle() {return originalTitle;}
+//    public void setOriginalTitle(String originalTitle) {this.originalTitle = originalTitle;}
+    @Bindable
     public String getOverview() {return overview;}
-    public void setOverview(String overview) {this.overview = overview;}
+    public void setOverview(String overview) {this.overview = overview;
+        notifyPropertyChanged(BR.overview);}
     public Double getPopularity() {return popularity;}
     public void setPopularity(Double popularity) {this.popularity = popularity;}
+    @Bindable
     public String getPosterPath() {return posterPath;}
-    public void setPosterPath(String posterPath) {this.posterPath = posterPath;}
-    public String getReleaseDate() {return releaseDate;}
-    public void setReleaseDate(String releaseDate) {this.releaseDate = releaseDate;}
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+        notifyPropertyChanged(BR.posterPath);
+    }
+    @Bindable
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+    public void setReleaseDate(String releaseDate) {this.releaseDate = releaseDate;notifyPropertyChanged(BR.releaseDate);}
+    @Bindable
     public String getTitle() {return title;}
-    public void setTitle(String title) {this.title = title;}
+    public void setTitle(String title) {
+        this.title = title;
+        notifyPropertyChanged(BR.title);
+    }
     public Boolean getVideo() {return video;}
     public void setVideo(Boolean video) {this.video = video;}
     public Double getVoteAverage() {return voteAverage;}
