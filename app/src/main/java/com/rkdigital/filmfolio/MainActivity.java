@@ -3,6 +3,7 @@ package com.rkdigital.filmfolio;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -75,18 +76,26 @@ public class MainActivity extends AppCompatActivity {
     private void displayMoviesInRecyclerView() {
         recyclerView = binding.recyclerview;
 
-        movieAdapter = new MovieAdapter(this, movies);
+        // Initialize adapter only once
+        if (movieAdapter == null) {
+            movieAdapter = new MovieAdapter(this, movies);
+            recyclerView.setAdapter(movieAdapter);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(movieAdapter);
-
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-
-        // notify an adapter associated with a RecyclerView
-        // that the underlying dataset hase changed
-        movieAdapter.notifyDataSetChanged();
-
-
-
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+                    if (layoutManager != null && layoutManager.findLastCompletelyVisibleItemPosition() == movies.size() - 1) {
+                        viewModel.loadMoreMovies();
+                    }
+                }
+            });
+        } else {
+            // Append new movies to the existing list
+            movieAdapter.notifyDataSetChanged();
+        }
     }
+
 }

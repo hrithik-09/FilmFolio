@@ -21,5 +21,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     public LiveData<List<Movie>>getAllMovies(){
         return repository.getMutableLiveData();
     }
+    public void loadMoreMovies() {
+        repository.loadMoreMovies();
+    }
 
 }
