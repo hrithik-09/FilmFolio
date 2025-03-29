@@ -1,6 +1,9 @@
 package com.rkdigital.filmfolio;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -28,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Movie> movies;
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
+    private EditText etSearch;
+    private ImageView ivSearch;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
@@ -55,6 +60,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 getPopularMovies();
+            }
+        });
+
+        etSearch = findViewById(R.id.etSearch);
+        ivSearch = findViewById(R.id.ivSearch);
+
+        ivSearch.setOnClickListener(v -> {
+            if (etSearch.getVisibility() == View.GONE) {
+                etSearch.setVisibility(View.VISIBLE);
+                etSearch.requestFocus();
+            } else {
+                etSearch.setVisibility(View.GONE);
+                etSearch.getText().clear(); // Clear text when hidden
             }
         });
 
