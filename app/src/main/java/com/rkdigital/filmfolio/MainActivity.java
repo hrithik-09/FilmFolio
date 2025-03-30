@@ -9,9 +9,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -32,10 +34,11 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
     private EditText etSearch;
-    private ImageView ivSearch;
+    private ImageView ivSearch,toggle;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
+    private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
                 etSearch.setVisibility(View.GONE);
                 etSearch.getText().clear(); // Clear text when hidden
             }
+        });
+        toggle=findViewById(R.id.ivHamburger);
+        drawerLayout=findViewById(R.id.drawer_layout);
+        toggle.setOnClickListener(view -> {
+            drawerLayout.openDrawer(GravityCompat.START);
+
         });
 
     }
