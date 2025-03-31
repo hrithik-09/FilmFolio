@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "797545005390",
+    "project_id": "filmfolio-f9cab",
+    "storage_bucket": "filmfolio-f9cab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797545005390:android:3487188f5d404901f65e1f",
+        "android_client_info": {
+          "package_name": "com.rkdigital.filmfolio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797545005390-7bfkt80g07e4dmaksuh626d4miqe17ab.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rkdigital.filmfolio",
+            "certificate_hash": "045648000694015cc914d346662d053cd98c86fe"
+          }
+        },
+        {
+          "client_id": "797545005390-qd547dpf21l30uk1a9h4drp46rhuj62l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv_aSli-WeLIYisMZypZDjxON3jD9Oyj0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797545005390-qd547dpf21l30uk1a9h4drp46rhuj62l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
