@@ -72,4 +72,5 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel:2.5.0-alpha04")
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha04")
+    implementation ("com.google.android.material:material:1.10.0")
 }
