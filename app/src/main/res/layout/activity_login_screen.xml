@@ -11,43 +11,46 @@
 
 
         <LinearLayout
+            android:id="@+id/googleLoginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:id="@+id/googleLoginButton"
-            android:background="@drawable/ic_login_edittext_backround"
+            android:layout_gravity="center"
             android:layout_marginTop="30dp"
+            android:background="@drawable/ic_login_edittext_backround"
             android:gravity="center"
-            android:layout_gravity="center">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent"
+            android:paddingHorizontal="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.801">
 
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_google_logo"
-                android:layout_marginEnd="10dp"
-                />
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_google_logo" />
+
             <TextView
-                android:layout_width="wrap_content"
                 android:id="@+id/continueWithGoogle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:text="Continue with Google"
-                android:textColor="@color/white"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                />
+                android:textColor="@color/white" />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_arrow"
-                android:layout_marginStart="10dp"/>
+                android:layout_marginStart="5dp"
+                android:src="@drawable/ic_arrow" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

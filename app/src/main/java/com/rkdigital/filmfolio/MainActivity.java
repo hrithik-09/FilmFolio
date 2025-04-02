@@ -1,5 +1,6 @@
 package com.rkdigital.filmfolio;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -7,6 +8,7 @@ import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
@@ -34,10 +36,14 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
     private EditText etSearch;
-    private ImageView ivSearch,toggle;
+    private ImageView ivSearch,toggle,filterIcon;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
+
+    private boolean[] selectedFilters;
+    private ArrayList<String> chosenFilters = new ArrayList<>();
+    private String[] filterOptions;
     private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +74,21 @@ public class MainActivity extends AppCompatActivity {
 
         etSearch = findViewById(R.id.etSearch);
         ivSearch = findViewById(R.id.ivSearch);
+        filterIcon =  findViewById(R.id.ivFilter);
+        filterOptions = getResources().getStringArray(R.array.filter_options);
+        selectedFilters = new boolean[filterOptions.length];
+
+        filterIcon.setOnClickListener(v -> {
+            MovieFilterBottomSheet filterDialog = new MovieFilterBottomSheet(
+//                    selectedFilters -> {
+//                // Apply selected filters
+////                applyFilters(selectedFilters);
+//            }
+            );
+            filterDialog.show(getSupportFragmentManager(), "FilterBottomSheet");
+        });
+
+
 
         ivSearch.setOnClickListener(v -> {
             if (etSearch.getVisibility() == View.GONE) {
@@ -99,7 +120,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    private void showFilterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Filters");
+        builder.setMultiChoiceItems(filterOptions, selectedFilters, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                if (isChecked) {
+                    chosenFilters.add(filterOptions[which]);
+                } else {
+                    chosenFilters.remove(filterOptions[which]);
+                }
+            }
+        });
 
+        builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                applyFilters();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
+    }
+
+    private void applyFilters() {
+        // Process chosenFilters list with TMDB query here
+    }
     private void displayMoviesInRecyclerView() {
         recyclerView = binding.recyclerview;
 

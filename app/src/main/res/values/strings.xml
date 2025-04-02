@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">FilmFolio</string>
+    <string name="api_key">9ca4f867b4717a8b5f17539f90b3c62c</string>
+    <string-array name="filter_options">
+            <item>Latest Releases</item>
+            <item>Most Popular</item>
+            <item>Top Rated</item>
+            <item>Genre: Action</item>
+            <item>Genre: Drama</item>
+            <item>Genre: Horror</item>
+    </string-array>
 </resources>
