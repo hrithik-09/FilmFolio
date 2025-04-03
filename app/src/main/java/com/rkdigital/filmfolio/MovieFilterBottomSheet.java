@@ -1,6 +1,8 @@
 package com.rkdigital.filmfolio;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +19,18 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.RangeSlider;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
     private ChipGroup chipGroupGenre, chipGroupSort;
+    private RangeSlider rangeSliderReleaseYear;
+    private TextView textViewMinYear, textViewMaxYear;
     private SeekBar seekBarRating;
     private TextView textViewRatingValue;
-    private TextView btnApply, btnReset,textViewYearRange;
-    private RangeSlider rangeSlider;
+    private Button btnApply, btnReset;
 
     private SharedPreferencesHelper sharedPreferencesHelper;
 
@@ -39,65 +43,85 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movie_filter, container, false);
 
-        sharedPreferencesHelper = SharedPreferencesHelper.getInstance(requireContext());
-
+        // Initialize UI elements
         chipGroupGenre = view.findViewById(R.id.chipGroupGenre);
         chipGroupSort = view.findViewById(R.id.chipGroupSort);
+        rangeSliderReleaseYear = view.findViewById(R.id.rangeSliderReleaseYear);
+        textViewMinYear = view.findViewById(R.id.textViewMinYear);
+        textViewMaxYear = view.findViewById(R.id.textViewMaxYear);
         seekBarRating = view.findViewById(R.id.seekBarRating);
         textViewRatingValue = view.findViewById(R.id.textViewRatingValue);
         btnApply = view.findViewById(R.id.btnApply);
         btnReset = view.findViewById(R.id.btnReset);
-        rangeSlider = view.findViewById(R.id.rangeSliderReleaseYear);
-        textViewYearRange = view.findViewById(R.id.textViewYearRange);
 
-        rangeSlider.setValues(2000f, 2020f);
+        sharedPreferencesHelper = SharedPreferencesHelper.getInstance(requireContext());
 
+        String[] genres = {"Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Thriller", "Romance"};
+        populateChipGroup(chipGroupGenre, genres, false); // Multi-select
 
-        rangeSlider.addOnChangeListener((slider, value, fromUser) -> {
-            List<Float> values = slider.getValues();
-            textViewYearRange.setText(String.format("%.0f - %.0f", values.get(0), values.get(1)));
-        });
+        // Populate Sort By options
+        String[] sortByOptions = {"Popularity", "Release Date", "Rating"};
+        populateChipGroup(chipGroupSort, sortByOptions, true); // Single-select
 
-        setupGenreChips();
-        setupSortChips();
-        setupSeekBar();
-        loadSavedFilters();
+        loadSavedPreferences();  // Load previously saved filters
 
-        btnApply.setOnClickListener(v -> saveFilters());
-        btnReset.setOnClickListener(v -> resetFilters());
+        setupListeners();  // Attach event listeners
 
         return view;
     }
 
-    private void setupGenreChips() {
-        String[] genres = {"Action", "Comedy", "Drama", "Horror", "Romance", "Sci-Fi"};
-        for (String genre : genres) {
-            Chip chip = new Chip(requireContext());
-            chip.setText(genre);
-            chip.setCheckable(true);
-            chip.setChipBackgroundColorResource(R.color.primaryBackground);
-            chip.setTextColor(getResources().getColor(R.color.black));
-            chipGroupGenre.addView(chip);
-        }
-    }
+    private void populateChipGroup(ChipGroup chipGroup, String[] options, boolean singleSelection) {
+        chipGroup.setSingleSelection(singleSelection);
+        chipGroup.removeAllViews(); // Clear old data
 
-    private void setupSortChips() {
-        String[] sortOptions = {"Popularity", "Release Date", "Rating"};
-        for (String option : sortOptions) {
+        for (String option : options) {
             Chip chip = new Chip(requireContext());
             chip.setText(option);
             chip.setCheckable(true);
-            chip.setChipBackgroundColorResource(R.color.primaryBackground);
-            chip.setTextColor(getResources().getColor(R.color.black));
-            chipGroupSort.addView(chip);
+            chip.setChipBackgroundColorResource(R.color.primaryColor);
+            chip.setTextColor(getResources().getColor(android.R.color.white));
+            chipGroup.addView(chip);
+        }
+    }
+    private void setupChipGroupListeners() {
+        for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupGenre.getChildAt(i);
+            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    chip.setChipBackgroundColorResource(R.color.chip_selected);
+                    chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
+                } else {
+                    chip.setChipBackgroundColorResource(R.color.chip_unselected);
+                    chip.setTextColor(getResources().getColor(R.color.chip_text_unselected));
+                }
+            });
+        }
+
+        for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupSort.getChildAt(i);
+            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    chip.setChipBackgroundColorResource(R.color.chip_selected);
+                    chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
+                } else {
+                    chip.setChipBackgroundColorResource(R.color.chip_unselected);
+                    chip.setTextColor(getResources().getColor(R.color.chip_text_unselected));
+                }
+            });
         }
     }
 
-    private void setupSeekBar() {
-        seekBarRating.setMax(10);
-        seekBarRating.setProgress(5);
-        textViewRatingValue.setText("5.0");
+    private void setupListeners() {
+        // RangeSlider for Release Year
+        rangeSliderReleaseYear.addOnChangeListener((slider, value, fromUser) -> {
+            List<Float> values = slider.getValues();
+            int minYear = values.get(0).intValue();
+            int maxYear = values.get(1).intValue();
+            textViewMinYear.setText(String.valueOf(minYear));
+            textViewMaxYear.setText(String.valueOf(maxYear));
+        });
 
+        // SeekBar for Rating
         seekBarRating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -110,66 +134,76 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+        setupChipGroupListeners();
+
+        // Apply Button
+        btnApply.setOnClickListener(v -> savePreferences());
+
+        // Reset Button
+        btnReset.setOnClickListener(v -> resetFilters());
     }
 
-    private void saveFilters() {
-        Set<String> selectedGenres = new HashSet<>();
+    private void savePreferences() {
+        List<Integer> selectedGenres = new ArrayList<>();
         for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
             Chip chip = (Chip) chipGroupGenre.getChildAt(i);
             if (chip.isChecked()) {
-                selectedGenres.add(chip.getText().toString());
+                selectedGenres.add((int) chip.getTag());
             }
         }
 
-        Set<String> selectedSort = new HashSet<>();
-        for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
-            Chip chip = (Chip) chipGroupSort.getChildAt(i);
-            if (chip.isChecked()) {
-                selectedSort.add(chip.getText().toString());
-            }
-        }
+        int selectedSortId = chipGroupSort.getCheckedChipId();
+        String selectedSort = selectedSortId != View.NO_ID ? ((Chip) chipGroupSort.findViewById(selectedSortId)).getText().toString() : "";
 
-//        String releaseYear = editTextReleaseYear.getText().toString();
-        int rating = seekBarRating.getProgress();
+        int minYear = rangeSliderReleaseYear.getValues().get(0).intValue();
+        int maxYear = rangeSliderReleaseYear.getValues().get(1).intValue();
+        int minRating = seekBarRating.getProgress();
 
-//        sharedPreferencesHelper.putString(sharedPreferencesHelper.getAppPrefs(),SharedPrefsKeys.FILTER_GENRES, selectedGenres);
-//        sharedPreferencesHelper.putStringSet(SharedPrefsKeys.FILTER_SORT, selectedSort);
-//        sharedPreferencesHelper.putString(SharedPrefsKeys.FILTER_YEAR, releaseYear);
-//        sharedPreferencesHelper.putInt(SharedPrefsKeys.FILTER_RATING, rating);
+        sharedPreferencesHelper.saveGenres(selectedGenres);
+        sharedPreferencesHelper.saveSortOption(selectedSort);
+        sharedPreferencesHelper.saveYearRange(minYear, maxYear);
+        sharedPreferencesHelper.saveMinRating(minRating);
 
-        dismiss();
+        dismiss(); // Close the dialog
     }
 
     private void resetFilters() {
-        chipGroupGenre.clearCheck();
-        chipGroupSort.clearCheck();
-        rangeSlider.resetPivot();
-        seekBarRating.setProgress(5);
-        textViewRatingValue.setText("5.0");
+        sharedPreferencesHelper.clearFilters();
+        loadSavedPreferences();
     }
 
-    private void loadSavedFilters() {
-//        Set<String> savedGenres = sharedPreferencesHelper.getStringSet(SharedPrefsKeys.FILTER_GENRES, new HashSet<>());
-//        Set<String> savedSort = sharedPreferencesHelper.getStringSet(SharedPrefsKeys.FILTER_SORT, new HashSet<>());
-//        String savedYear = sharedPreferencesHelper.getString(SharedPrefsKeys.FILTER_YEAR, "");
-//        int savedRating = sharedPreferencesHelper.getInt(SharedPrefsKeys.FILTER_RATING, 5);
+    private void loadSavedPreferences() {
+        // Get saved genres safely
+        List<Integer> savedGenres = sharedPreferencesHelper.getGenres();
+        if (savedGenres == null) savedGenres = new ArrayList<>(); // Avoid NullPointerException
 
-//        for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
-//            Chip chip = (Chip) chipGroupGenre.getChildAt(i);
-//            if (savedGenres.contains(chip.getText().toString())) {
-//                chip.setChecked(true);
-//            }
-//        }
-//
-//        for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
-//            Chip chip = (Chip) chipGroupSort.getChildAt(i);
-//            if (savedSort.contains(chip.getText().toString())) {
-//                chip.setChecked(true);
-//            }
-//        }
-//
-//        editTextReleaseYear.setText(savedYear);
-//        seekBarRating.setProgress(savedRating);
-//        textViewRatingValue.setText(String.valueOf(savedRating));
+        for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupGenre.getChildAt(i);
+            if (chip.getTag() != null) { // Check if tag is not null before casting
+                chip.setChecked(savedGenres.contains((int) chip.getTag()));
+            }
+        }
+
+        // Get saved sort option safely
+        String savedSort = sharedPreferencesHelper.getSortOption();
+        if (savedSort != null) {
+            for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
+                Chip chip = (Chip) chipGroupSort.getChildAt(i);
+                if (chip.getText() != null && chip.getText().toString().equals(savedSort)) {
+                    chip.setChecked(true);
+                }
+            }
+        }
+
+        // Load Year Range
+        Pair<Integer, Integer> yearRange = sharedPreferencesHelper.getYearRange();
+        rangeSliderReleaseYear.setValues((float) yearRange.first, (float) yearRange.second);
+        textViewMinYear.setText(String.valueOf(yearRange.first));
+        textViewMaxYear.setText(String.valueOf(yearRange.second));
+
+        // Load Min Rating
+        int savedMinRating = sharedPreferencesHelper.getMinRating();
+        seekBarRating.setProgress(savedMinRating);
+        textViewRatingValue.setText(String.valueOf(savedMinRating));
     }
 }

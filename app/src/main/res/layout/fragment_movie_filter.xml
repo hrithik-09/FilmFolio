@@ -80,21 +80,51 @@
         android:valueFrom="1900"
         android:valueTo="2025"
         android:stepSize="1"
-        app:trackColor="@color/textSecondary"
+        app:labelBehavior="gone"
+        app:trackColorInactive="@color/textSecondary"
+        app:trackColorActive="@color/primaryColor"
         app:thumbTint="@color/primaryColor"
         app:haloColor="@color/primaryColor"
-
+        app:thumbRadius="12dp"
+        app:haloRadius="20dp"
+        app:trackHeight="4dp"
         android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:id="@+id/textViewYearRange"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="1900 - 2025"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/textViewMinYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1900"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:padding="6dp"
+            android:background="@drawable/year_pill_background"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="to"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:paddingHorizontal="8dp"/>
+
+        <TextView
+            android:id="@+id/textViewMaxYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:padding="6dp"
+            android:background="@drawable/year_pill_background"/>
+    </LinearLayout>
 
 
 
