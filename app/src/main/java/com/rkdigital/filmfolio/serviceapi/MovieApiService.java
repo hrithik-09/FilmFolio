@@ -12,4 +12,16 @@ public interface MovieApiService {
     Call<Result>getPopularMovies(
             @Query("api_key") String apiKey,
             @Query("page") int page);
+
+    @GET("discover/movie")
+    Call<Result> getFilteredMovies(
+            @Query("api_key") String apiKey,
+            @Query("page") int page,
+            @Query("with_genres") String genreIds,
+            @Query("sort_by") String sortBy,
+            @Query("primary_release_date.gte") String releaseDateFrom,
+            @Query("primary_release_date.lte") String releaseDateTo,
+            @Query("vote_average.gte") int minRating
+    );
+
 }

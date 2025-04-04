@@ -30,13 +30,17 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
     private TextView textViewMinYear, textViewMaxYear;
     private SeekBar seekBarRating;
     private TextView textViewRatingValue;
+    private Runnable onApplyCallback;
     private Button btnApply, btnReset;
 
     private SharedPreferencesHelper sharedPreferencesHelper;
 
-    public static MovieFilterBottomSheet newInstance() {
-        return new MovieFilterBottomSheet();
+    public static MovieFilterBottomSheet newInstance(Runnable onApplyCallback) {
+        MovieFilterBottomSheet sheet = new MovieFilterBottomSheet();
+        sheet.onApplyCallback = onApplyCallback;
+        return sheet;
     }
+
 
     @Nullable
     @Override
