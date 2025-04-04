@@ -124,7 +124,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="@color/primaryDark"> <!-- Matching Maroon Theme -->
+            android:background="@color/primaryDark">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -157,7 +157,7 @@
                         android:src="@drawable/ic_user_avatar"
                         android:padding="4dp"
                         android:background="@drawable/circle_background"
-                        app:tint="@color/accentColor"/> <!-- Accent Color -->
+                        app:tint="@color/accentColor"/>
 
                     <TextView
                         android:id="@+id/userName"
@@ -195,20 +195,19 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
-                    <TextView
-                        android:id="@+id/themeText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Dark Theme"
-                        android:textColor="@color/textPrimary"
-                        android:textSize="16sp"/>
-
                     <Switch
-                        android:id="@+id/themeSwitch"
-                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        android:id="@+id/dark_mode_switch"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:thumbTint="@color/accentColor"/>
+                        android:thumbTextPadding="15dp"
+                        android:textColor="@color/textPrimary"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:thumb="@drawable/custom_switch_thumb"
+                        android:track="@drawable/custom_switch_track"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"/>
                 </LinearLayout>
 
                 <!-- Logout Option -->
