@@ -23,5 +23,12 @@ public interface MovieApiService {
             @Query("primary_release_date.lte") String releaseDateTo,
             @Query("vote_average.gte") int minRating
     );
+    @GET("search/movie")
+    Call<Result> searchMovies(
+            @Query("api_key") String apiKey,
+            @Query("query") String query,
+            @Query("page") int page
+    );
+
 
 }
