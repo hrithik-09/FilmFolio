@@ -24,5 +24,9 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void loadMoreMovies() {
         repository.loadMoreMovies();
     }
+    public void refreshMovies() {
+        repository.refreshMovies();
+    }
+
 
 }

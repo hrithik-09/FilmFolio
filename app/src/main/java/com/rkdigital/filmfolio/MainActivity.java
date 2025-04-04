@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         binding = DataBindingUtil.setContentView(
                 this,
                 R.layout.activity_main
@@ -59,16 +58,14 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this)
                 .get(MainActivityViewModel.class);
 
-        getPopularMovies();
-
-
+        getMovies();
 
         swipeRefreshLayout = binding.swipeLayout;
         swipeRefreshLayout.setColorSchemeResources(R.color.black);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getPopularMovies();
+                getMovies();
             }
         });
 
@@ -79,12 +76,9 @@ public class MainActivity extends AppCompatActivity {
         selectedFilters = new boolean[filterOptions.length];
 
         filterIcon.setOnClickListener(v -> {
-            MovieFilterBottomSheet filterDialog = new MovieFilterBottomSheet(
-//                    selectedFilters -> {
-//                // Apply selected filters
-////                applyFilters(selectedFilters);
-//            }
-            );
+            MovieFilterBottomSheet filterDialog = MovieFilterBottomSheet.newInstance(() -> {
+                viewModel.refreshMovies(); // ← This triggers filtered movie refresh
+            });
             filterDialog.show(getSupportFragmentManager(), "FilterBottomSheet");
         });
 
@@ -96,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 etSearch.requestFocus();
             } else {
                 etSearch.setVisibility(View.GONE);
-                etSearch.getText().clear(); // Clear text when hidden
+                etSearch.getText().clear();
             }
         });
         toggle=findViewById(R.id.ivHamburger);
@@ -108,8 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void getPopularMovies() {
-
+    private void getMovies() {
         viewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> moviesFromLiveData) {
@@ -119,34 +112,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-    private void showFilterDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Filters");
-        builder.setMultiChoiceItems(filterOptions, selectedFilters, new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                if (isChecked) {
-                    chosenFilters.add(filterOptions[which]);
-                } else {
-                    chosenFilters.remove(filterOptions[which]);
-                }
-            }
-        });
-
-        builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                applyFilters();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", null);
-        builder.create().show();
-    }
-
-    private void applyFilters() {
-        // Process chosenFilters list with TMDB query here
     }
     private void displayMoviesInRecyclerView() {
         recyclerView = binding.recyclerview;
@@ -168,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Append new movies to the existing list
             movieAdapter.notifyDataSetChanged();
         }
     }
