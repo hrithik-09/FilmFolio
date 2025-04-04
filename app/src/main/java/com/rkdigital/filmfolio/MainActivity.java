@@ -1,19 +1,18 @@
 package com.rkdigital.filmfolio;
-
-import android.content.DialogInterface;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
@@ -40,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable searchRunnable;
+
 
     private boolean[] selectedFilters;
     private ArrayList<String> chosenFilters = new ArrayList<>();
@@ -76,8 +78,11 @@ public class MainActivity extends AppCompatActivity {
         selectedFilters = new boolean[filterOptions.length];
 
         filterIcon.setOnClickListener(v -> {
+            if (getSupportFragmentManager().findFragmentByTag("FilterBottomSheet") != null) {
+                return;
+            }
             MovieFilterBottomSheet filterDialog = MovieFilterBottomSheet.newInstance(() -> {
-                viewModel.refreshMovies(); // ← This triggers filtered movie refresh
+                viewModel.refreshMovies(); // <— This triggers filtered movie refresh
             });
             filterDialog.show(getSupportFragmentManager(), "FilterBottomSheet");
         });
@@ -88,11 +93,24 @@ public class MainActivity extends AppCompatActivity {
             if (etSearch.getVisibility() == View.GONE) {
                 etSearch.setVisibility(View.VISIBLE);
                 etSearch.requestFocus();
+
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.showSoftInput(etSearch, InputMethodManager.SHOW_IMPLICIT);
+                }
             } else {
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+                }
+
                 etSearch.setVisibility(View.GONE);
-                etSearch.getText().clear();
             }
         });
+
+        setupLiveSearch();
         toggle=findViewById(R.id.ivHamburger);
         drawerLayout=findViewById(R.id.drawer_layout);
         toggle.setOnClickListener(view -> {
@@ -101,14 +119,35 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    private void setupLiveSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
+            @Override
+            public void afterTextChanged(Editable s) {
+                String query = s.toString().trim();
+
+                searchHandler.removeCallbacks(searchRunnable);
+                searchRunnable = () -> {
+                    if (!query.isEmpty()) {
+                        viewModel.searchMovies(query);
+                    } else {
+                        viewModel.clearSearch();
+                    }
+                    recyclerView.scrollToPosition(0); // reset scroll
+                };
+                searchHandler.postDelayed(searchRunnable, 500); // debounce 500ms
+            }
+        });
+    }
     private void getMovies() {
         viewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> moviesFromLiveData) {
                 movies = (ArrayList<Movie>) moviesFromLiveData;
                 displayMoviesInRecyclerView();
-
+                recyclerView.scrollToPosition(0);
             }
         });
 
@@ -136,5 +175,4 @@ public class MainActivity extends AppCompatActivity {
             movieAdapter.notifyDataSetChanged();
         }
     }
-
 }
