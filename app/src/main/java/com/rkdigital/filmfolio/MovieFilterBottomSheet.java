@@ -61,11 +61,11 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
 
         // Populate Sort By options
         String[] sortByOptions = {"Popularity", "Release Date", "Rating"};
-        populateChipGroup(chipGroupSort, sortByOptions, true); // Single-select
+        populateChipGroup(chipGroupSort, sortByOptions, true);
 
-        loadSavedPreferences();  // Load previously saved filters
+        loadSavedPreferences();
 
-        setupListeners();  // Attach event listeners
+        setupListeners();
 
         return view;
     }
@@ -74,12 +74,18 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
         chipGroup.setSingleSelection(singleSelection);
         chipGroup.removeAllViews(); // Clear old data
 
-        for (String option : options) {
+        for (int i = 0; i < options.length; i++) {
+            String option = options[i];
             Chip chip = new Chip(requireContext());
             chip.setText(option);
             chip.setCheckable(true);
-            chip.setChipBackgroundColorResource(R.color.primaryColor);
-            chip.setTextColor(getResources().getColor(android.R.color.white));
+            if (!singleSelection) {
+                chip.setTag(i);
+            }
+
+            chip.setChecked(false);
+            updateChipColor(chip, false);
+
             chipGroup.addView(chip);
         }
     }
@@ -87,27 +93,26 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
         for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
             Chip chip = (Chip) chipGroupGenre.getChildAt(i);
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    chip.setChipBackgroundColorResource(R.color.chip_selected);
-                    chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
-                } else {
-                    chip.setChipBackgroundColorResource(R.color.chip_unselected);
-                    chip.setTextColor(getResources().getColor(R.color.chip_text_unselected));
-                }
+                updateChipColor(chip, isChecked);
             });
+
         }
 
         for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
             Chip chip = (Chip) chipGroupSort.getChildAt(i);
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    chip.setChipBackgroundColorResource(R.color.chip_selected);
-                    chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
-                } else {
-                    chip.setChipBackgroundColorResource(R.color.chip_unselected);
-                    chip.setTextColor(getResources().getColor(R.color.chip_text_unselected));
-                }
+                updateChipColor(chip, isChecked);
             });
+
+        }
+    }
+    private void updateChipColor(Chip chip, boolean isChecked) {
+        if (isChecked) {
+            chip.setChipBackgroundColorResource(R.color.chip_selected);
+            chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
+        } else {
+            chip.setChipBackgroundColorResource(R.color.chip_unselected);
+            chip.setTextColor(getResources().getColor(R.color.chip_text_unselected));
         }
     }
 
@@ -137,7 +142,11 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
         setupChipGroupListeners();
 
         // Apply Button
-        btnApply.setOnClickListener(v -> savePreferences());
+        btnApply.setOnClickListener(v -> {
+            savePreferences();
+            if (onApplyCallback != null) onApplyCallback.run();
+            dismiss();
+        });
 
         // Reset Button
         btnReset.setOnClickListener(v -> resetFilters());
@@ -164,34 +173,35 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
         sharedPreferencesHelper.saveYearRange(minYear, maxYear);
         sharedPreferencesHelper.saveMinRating(minRating);
 
-        dismiss(); // Close the dialog
+        dismiss();
     }
 
     private void resetFilters() {
-        sharedPreferencesHelper.clearFilters();
         loadSavedPreferences();
     }
 
     private void loadSavedPreferences() {
-        // Get saved genres safely
         List<Integer> savedGenres = sharedPreferencesHelper.getGenres();
-        if (savedGenres == null) savedGenres = new ArrayList<>(); // Avoid NullPointerException
+        if (savedGenres == null) savedGenres = new ArrayList<>();
 
         for (int i = 0; i < chipGroupGenre.getChildCount(); i++) {
             Chip chip = (Chip) chipGroupGenre.getChildAt(i);
-            if (chip.getTag() != null) { // Check if tag is not null before casting
-                chip.setChecked(savedGenres.contains((int) chip.getTag()));
+            if (chip.getTag() != null) {
+                boolean isSelected = savedGenres.contains((int) chip.getTag());
+                chip.setChecked(isSelected);
+                updateChipColor(chip, isSelected);
+                chip.jumpDrawablesToCurrentState();
             }
         }
 
-        // Get saved sort option safely
         String savedSort = sharedPreferencesHelper.getSortOption();
         if (savedSort != null) {
             for (int i = 0; i < chipGroupSort.getChildCount(); i++) {
                 Chip chip = (Chip) chipGroupSort.getChildAt(i);
-                if (chip.getText() != null && chip.getText().toString().equals(savedSort)) {
-                    chip.setChecked(true);
-                }
+                boolean isSelected = chip.getText() != null && chip.getText().toString().equals(savedSort);
+                chip.setChecked(isSelected);
+                updateChipColor(chip, isSelected);
+                chip.jumpDrawablesToCurrentState();
             }
         }
 

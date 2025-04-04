@@ -92,16 +92,17 @@ public class SharedPreferencesHelper {
         for (String genre : genreSet) {
             genres.add(Integer.parseInt(genre));
         }
-        return genres;
-    }
 
-    public void saveSortOption(String sortOption) {
-        userPrefs.edit().putString(SharedPrefsKeys.KEY_SORT, sortOption).apply();
+        return genres;
     }
 
     public String getSortOption() {
         return userPrefs.getString(SharedPrefsKeys.KEY_SORT, "");
     }
+    public void saveSortOption(String sortOption) {
+        userPrefs.edit().putString(SharedPrefsKeys.KEY_SORT, sortOption).apply();
+    }
+
 
     public void saveYearRange(int minYear, int maxYear) {
         userPrefs.edit().putInt(SharedPrefsKeys.KEY_MIN_YEAR, minYear).putInt(SharedPrefsKeys.KEY_MAX_YEAR, maxYear).apply();
