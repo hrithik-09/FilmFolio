@@ -22,6 +22,7 @@
             android:layout_height="match_parent"
             android:id="@+id/cvMovie"
             android:layout_margin="5dp"
+            app:cardBackgroundColor="@color/card_background"
             android:elevation="3dp"
             android:layout_gravity="center"
             app:cardCornerRadius="1dp">
@@ -45,7 +46,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingTop="10dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/card_text"
                     android:textSize="15dp"
                     android:id="@+id/tvTitle"/>
 
@@ -58,7 +59,7 @@
                     android:paddingRight="10dp"
                     android:paddingBottom="10dp"
                     android:textSize="12dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/card_text"
                     android:id="@+id/tvRating"/>
 
             </RelativeLayout>

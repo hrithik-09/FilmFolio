@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:title="FilmFolio"
-            app:titleTextColor="@android:color/white"
+            app:titleTextColor="@color/textPrimary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <RelativeLayout
@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FilmFolio"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/textPrimary"
                     android:textSize="18sp"
                     android:layout_toEndOf="@id/ivHamburger"
                     android:layout_centerVertical="true"
@@ -118,58 +118,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--        <LinearLayout-->
-<!--            android:id="@+id/navigation_view"-->
-<!--            android:layout_width="300dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_gravity="start"-->
-<!--            android:orientation="vertical"-->
-<!--            android:background=""-->
-<!--            android:padding="20dp"-->
-<!--            >-->
 
-<!--            <TextView-->
-<!--                android:text="FilmFolio"-->
-<!--                android:layout_marginTop="10dp"-->
-<!--                android:textSize="28sp"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:textStyle="bold"-->
-<!--                android:textColor=""-->
-<!--                android:paddingBottom="12dp"-->
-<!--                android:gravity="center"/>-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/version_detail"-->
-<!--                android:text="Version 1.0"-->
-<!--                android:textColor=""-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:textSize="14sp"-->
-<!--                android:gravity="center"-->
-<!--                android:paddingBottom="20dp"/>-->
-
-<!--            <Switch-->
-<!--                android:layout_gravity="center"-->
-<!--                android:id="@+id/dark_mode_switch"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:thumbTextPadding="15dp"-->
-<!--                android:textColor="@color/textPrimary"-->
-<!--                android:paddingStart="8dp"-->
-<!--                android:paddingEnd="8dp"-->
-<!--                android:thumb="@drawable/custom_switch_thumb"-->
-<!--                android:track="@drawable/custom_switch_track"-->
-<!--                android:paddingTop="10dp"-->
-<!--                android:paddingBottom="10dp"/>-->
-
-<!--        </LinearLayout>-->
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="#4B0000"> <!-- Matching Maroon Theme -->
+            android:background="@color/primaryDark"> <!-- Matching Maroon Theme -->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -183,7 +138,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FilmFolio"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/textPrimary"
                     android:textSize="22sp"
                     android:paddingBottom="16dp"
                     android:textStyle="bold"/>
@@ -202,14 +157,14 @@
                         android:src="@drawable/ic_user_avatar"
                         android:padding="4dp"
                         android:background="@drawable/circle_background"
-                        app:tint="#FF4500"/> <!-- Accent Color -->
+                        app:tint="@color/accentColor"/> <!-- Accent Color -->
 
                     <TextView
                         android:id="@+id/userName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Hrithik"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/textPrimary"
                         android:textSize="16sp"
                         android:layout_marginStart="8dp"/>
                 </LinearLayout>
@@ -228,7 +183,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Account Settings"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/textPrimary"
                     android:textSize="16sp"
                     android:paddingBottom="16dp"/>
 
@@ -245,7 +200,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Dark Theme"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/textPrimary"
                         android:textSize="16sp"/>
 
                     <Switch
