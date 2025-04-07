@@ -187,28 +187,7 @@
                     android:textSize="16sp"
                     android:paddingBottom="16dp"/>
 
-                <!-- Switch for Themes -->
-                <LinearLayout
-                    android:id="@+id/themeSwitchLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
 
-                    <Switch
-                        android:layout_gravity="center"
-                        android:id="@+id/dark_mode_switch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:thumbTextPadding="15dp"
-                        android:textColor="@color/textPrimary"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:thumb="@drawable/custom_switch_thumb"
-                        android:track="@drawable/custom_switch_track"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"/>
-                </LinearLayout>
 
                 <!-- Logout Option -->
                 <TextView
