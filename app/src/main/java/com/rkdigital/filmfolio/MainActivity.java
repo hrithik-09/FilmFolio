@@ -66,16 +66,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferencesHelper = SharedPreferencesHelper.getInstance(this);
-        boolean isDarkMode = sharedPreferencesHelper.getBoolean(sharedPreferencesHelper.getAppPrefs(),SharedPrefsKeys.THEME,isSystemDarkModeEnabled());
-
-        int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
-        if (isDarkMode && currentMode != Configuration.UI_MODE_NIGHT_YES) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else if (!isDarkMode && currentMode != Configuration.UI_MODE_NIGHT_NO) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -88,24 +78,6 @@ public class MainActivity extends AppCompatActivity {
                 .get(MainActivityViewModel.class);
 
         getMovies();
-
-        darkModeSwitch = findViewById(R.id.dark_mode_switch);
-        darkModeSwitch.setChecked(isDarkMode);
-        updateSwitchText(isDarkMode);
-        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Save preference
-            sharedPreferencesHelper.putBoolean(sharedPreferencesHelper.getAppPrefs(),SharedPrefsKeys.THEME,isChecked);
-
-            // Switch theme only if there's a change
-            drawerLayout.closeDrawer(GravityCompat.START);
-
-            // Delay theme change slightly to allow drawer to close
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                AppCompatDelegate.setDefaultNightMode(
-                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-                );
-            }, 250); // adjust delay if needed
-        });
 
         swipeRefreshLayout = binding.swipeLayout;
         swipeRefreshLayout.setColorSchemeResources(R.color.black);
