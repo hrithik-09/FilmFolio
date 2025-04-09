@@ -9,22 +9,38 @@
     android:background="@drawable/bottom_sheet_rounded">
 
     <!-- Header -->
-    <TextView
-        android:id="@+id/tvFilterHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Filter Movies"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:layout_marginBottom="12dp" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+        <TextView
+            android:id="@+id/tvFilterHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter Movies"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+             />
+
+        <ImageView
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_filter" />
+    </LinearLayout>
+
 
     <!-- Divider -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/textSecondary"
+        android:background="#4D4D4D"
         android:layout_marginBottom="16dp" />
 
     <!-- Genres -->
@@ -32,7 +48,7 @@
         android:text="Genres"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
@@ -50,7 +66,7 @@
         android:text="Sort By"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
@@ -68,7 +84,7 @@
         android:text="Release Year"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
@@ -80,16 +96,19 @@
         android:valueFrom="1900"
         android:valueTo="2025"
         android:stepSize="1"
+        android:layout_marginBottom="10dp"
         app:labelBehavior="gone"
-        app:trackColorInactive="@color/textSecondary"
-        app:trackColorActive="@color/primaryColor"
-        app:thumbTint="@color/primaryColor"
-        app:haloColor="@color/primaryColor"
-        app:thumbRadius="12dp"
-        app:haloRadius="20dp"
-        app:trackHeight="4dp"
-        android:layout_marginBottom="8dp"/>
-
+        app:trackColorActive="#FF4D4D"
+        app:thumbTint="#FF4D4D"
+        app:haloColor="#33FF4D4D"
+        app:trackColorInactive="#4D4D4D"
+        app:thumbRadius="14dp"
+        app:haloRadius="22dp"
+        app:trackHeight="6dp"
+        android:elevation="2dp"
+        app:tickColorActive="#FF4D4D"
+        app:tickColorInactive="#4D4D4D"
+        app:tickVisible="true"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -133,7 +152,7 @@
         android:text="Minimum Rating"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
@@ -144,8 +163,10 @@
         android:layout_height="wrap_content"
         android:max="10"
         android:progress="5"
-        android:thumbTint="@color/primaryColor"
-        android:progressTint="@color/primaryColor"
+        android:thumbTint="#FF4D4D"
+        android:progressTint="#FF4D4D"
+        android:progressBackgroundTint="#FFFFFF"
+        android:splitTrack="false"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -167,30 +188,31 @@
         android:orientation="horizontal"
         android:weightSum="2">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnReset"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:text="Reset"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/textSecondary"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:textColor="#FF4D4D"
+            android:textSize="14sp"
+            app:strokeColor="#FF4D4D"
+            app:strokeWidth="1dp"
             android:layout_marginEnd="8dp"
+            app:cornerRadius="24dp"
             />
 
         <Button
             android:id="@+id/btnApply"
             android:text="Apply"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/primaryColor"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginStart="8dp"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:backgroundTint="#FF4D4D"
+            app:cornerRadius="24dp"
             />
     </LinearLayout>
 </LinearLayout>

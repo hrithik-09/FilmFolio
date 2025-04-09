@@ -67,7 +67,7 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_filter"
                         android:padding="10dp"
-                        app:tint="@color/textSecondary" />
+                        app:tint="@color/white" />
 
                     <ImageView
                         android:id="@+id/ivSearch"
@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_search"
                         android:padding="10dp"
-                        app:tint="@color/textSecondary" />
+                        app:tint="@color/white" />
                 </LinearLayout>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>

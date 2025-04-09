@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primaryDark">#4B0000</color>
+    <color name="primaryDark">#0F0E0E</color>
     <color name="toolbarText">#FFFFFF</color>
     <color name="primaryColor">#800000</color>
     <color name="primaryBackground">#E8C7C7</color>
@@ -10,7 +10,7 @@
     <color name="accentColor">#FF5733</color>
     <color name="textPrimary">#FFFFFF</color>
     <color name="textSecondary">#E6B37E</color>
-    <color name="chip_selected">#800000</color>
+    <color name="chip_selected">#2A0F0F</color>
     <color name="chip_unselected">#555555</color>
     <color name="chip_text_selected">#FFFFFF</color>
     <color name="chip_text_unselected">#BBBBBB</color>
