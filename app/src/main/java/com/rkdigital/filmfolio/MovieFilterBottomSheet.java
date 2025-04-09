@@ -1,6 +1,7 @@
 package com.rkdigital.filmfolio;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -113,15 +114,21 @@ public class MovieFilterBottomSheet extends BottomSheetDialogFragment {
     private void updateChipColor(Chip chip, boolean isChecked) {
         if (isChecked) {
             chip.setChipBackgroundColorResource(R.color.chip_selected);
-            chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
+//            chip.setTextColor(getResources().getColor(R.color.chip_text_selected));
+            chip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#FF4D4D")));
+            chip.setChipStrokeWidth(1.5f);
+            chip.setTextColor(Color.parseColor("#E6E6E6"));
         } else {
             chip.setChipBackgroundColorResource(R.color.chip_unselected);
             chip.setTextColor(getResources().getColor(R.color.chip_text_unselected));
+            chip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#999999")));
+            chip.setChipStrokeWidth(1.5f);
         }
     }
 
     private void setupListeners() {
         // RangeSlider for Release Year
+        rangeSliderReleaseYear.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#FF4D4D")));
         rangeSliderReleaseYear.addOnChangeListener((slider, value, fromUser) -> {
             List<Float> values = slider.getValues();
             int minYear = values.get(0).intValue();
