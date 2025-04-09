@@ -15,8 +15,18 @@
         android:theme="@style/Theme.FilmFolio"
         tools:targetApi="31">
         <activity
+            android:name=".MovieAbout"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".wishlist"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".LoginScreen"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SplashScreen"
             android:exported="true"
@@ -30,7 +40,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

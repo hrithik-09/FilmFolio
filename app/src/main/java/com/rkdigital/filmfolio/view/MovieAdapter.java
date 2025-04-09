@@ -1,6 +1,7 @@
 package com.rkdigital.filmfolio.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.rkdigital.filmfolio.MovieAbout;
 import com.rkdigital.filmfolio.R;
 import com.rkdigital.filmfolio.databinding.MovieListItemBinding;
 import com.rkdigital.filmfolio.model.Movie;
@@ -58,10 +60,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             movieListItemBinding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     int position = getAdapterPosition();
-
-
+                    if (position != RecyclerView.NO_POSITION) {
+                        Movie movie = movieArrayList.get(position);
+                        Intent intent = new Intent(context, MovieAbout.class);
+                        intent.putExtra("movie_id", movie.getId());
+                        context.startActivity(intent);
+                    }
                 }
             });
 

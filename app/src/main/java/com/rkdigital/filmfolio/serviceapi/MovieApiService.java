@@ -1,9 +1,11 @@
 package com.rkdigital.filmfolio.serviceapi;
 
+import com.rkdigital.filmfolio.model.MovieDetail;
 import com.rkdigital.filmfolio.model.Result;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface MovieApiService {
@@ -28,6 +30,12 @@ public interface MovieApiService {
             @Query("api_key") String apiKey,
             @Query("query") String query,
             @Query("page") int page
+    );
+    @GET("movie/{movie_id}")
+    Call<MovieDetail> getMovieDetails(
+            @Path("movie_id") int movieId,
+            @Query("api_key") String apiKey,
+            @Query("append_to_response") String extra
     );
 
 
