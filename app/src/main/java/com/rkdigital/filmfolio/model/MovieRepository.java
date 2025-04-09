@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.rkdigital.filmfolio.SharedPreferencesHelper;
@@ -196,5 +197,27 @@ public class MovieRepository {
     }
     public int getNextPage() {
         return ++currentPage;
+    }
+    public LiveData<MovieDetail> getMovieDetails(int movieId)
+        {
+        MutableLiveData<MovieDetail> movieDetailLiveData = new MutableLiveData<>();
+        MovieApiService apiService = RetrofitInstance.getService();
+        apiService.getMovieDetails(movieId, application.getString(R.string.api_key), "credits").enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                if (response.isSuccessful()) {
+                    movieDetailLiveData.setValue(response.body());
+                } else {
+                    movieDetailLiveData.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                movieDetailLiveData.setValue(null);
+            }
+        });
+
+        return movieDetailLiveData;
     }
 }

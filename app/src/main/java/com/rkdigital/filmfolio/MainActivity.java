@@ -53,16 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private String[] filterOptions;
     private DrawerLayout drawerLayout;
 
-    private void updateSwitchText(boolean isDarkMode) {
-        darkModeSwitch.setText(isDarkMode ? "Light Mode" : "Dark Mode");
-    }
-
-
-    private boolean isSystemDarkModeEnabled() {
-        int currentNightMode = getResources().getConfiguration().uiMode
-                & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
-        return currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferencesHelper = SharedPreferencesHelper.getInstance(this);
