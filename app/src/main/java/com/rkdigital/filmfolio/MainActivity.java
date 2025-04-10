@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +36,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<Movie> movies;
-    private Switch darkModeSwitch;
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
     private EditText etSearch;
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferencesHelper sharedPreferencesHelper;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
+    private TextView userName;
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
 
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         etSearch = findViewById(R.id.etSearch);
         ivSearch = findViewById(R.id.ivSearch);
+        userName = findViewById(R.id.userName);
         filterIcon =  findViewById(R.id.ivFilter);
         filterOptions = getResources().getStringArray(R.array.filter_options);
         selectedFilters = new boolean[filterOptions.length];
@@ -94,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
             filterDialog.show(getSupportFragmentManager(), "FilterBottomSheet");
         });
 
-
+        String user = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_NAME,"User Name");
+        userName.setText(user);
 
         ivSearch.setOnClickListener(v -> {
             if (etSearch.getVisibility() == View.GONE) {
