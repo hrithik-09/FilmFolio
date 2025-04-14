@@ -1,4 +1,4 @@
-package com.rkdigital.filmfolio;
+package com.rkdigital.filmfolio.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import android.util.Pair;
+
+import com.rkdigital.filmfolio.SharedPrefsKeys;
 
 public class SharedPreferencesHelper {
     private static SharedPreferencesHelper instance;
@@ -78,6 +80,9 @@ public class SharedPreferencesHelper {
         prefs.edit().clear().apply();
     }
 
+
+
+    //Filter Application
     public void saveGenres(List<Integer> genres) {
         Set<String> genreSet = new HashSet<>();
         for (Integer genre : genres) {

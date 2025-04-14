@@ -8,8 +8,7 @@ import android.util.Pair;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.rkdigital.filmfolio.SharedPreferencesHelper;
-import com.rkdigital.filmfolio.model.Movie;
+import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.R;
 import com.rkdigital.filmfolio.serviceapi.MovieApiService;
 import com.rkdigital.filmfolio.serviceapi.RetrofitInstance;

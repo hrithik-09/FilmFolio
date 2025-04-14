@@ -3,22 +3,23 @@ package com.rkdigital.filmfolio;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.content.Intent;
-import androidx.activity.EdgeToEdge;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import android.util.Log;
 import android.widget.Toast;
-import androidx.activity.result.IntentSenderRequest;
+
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
+import com.rkdigital.filmfolio.storage.SharedPreferenceObserver;
+import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
+
 import android.widget.LinearLayout;
 
 import java.util.concurrent.ExecutorService;
