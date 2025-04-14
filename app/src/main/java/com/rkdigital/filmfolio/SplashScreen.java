@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
+
 public class SplashScreen extends AppCompatActivity{
     private SharedPreferencesHelper sharedPreferencesHelper;
     @Override

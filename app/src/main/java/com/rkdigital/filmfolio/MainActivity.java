@@ -1,6 +1,8 @@
 package com.rkdigital.filmfolio;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
-import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,12 +12,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -28,6 +28,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.rkdigital.filmfolio.databinding.ActivityMainBinding;
 import com.rkdigital.filmfolio.model.Movie;
+import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.MovieAdapter;
 import com.rkdigital.filmfolio.viewmodel.MainActivityViewModel;
 
@@ -129,6 +130,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "reminder_channel", "Reminders", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Channel for movie reminders");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+    }
+
     private void setupLiveSearch() {
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

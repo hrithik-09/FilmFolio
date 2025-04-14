@@ -59,6 +59,15 @@ dependencies {
     implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.credentials:credentials:1.5.0-rc01") // Latest Credential Manager API
 
+
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    implementation ("com.google.android.material:material:1.10.0")
+
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.google.code.gson:gson:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")

@@ -1,4 +1,4 @@
-package com.rkdigital.filmfolio;
+package com.rkdigital.filmfolio.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
