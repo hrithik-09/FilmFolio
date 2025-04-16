@@ -28,9 +28,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.rkdigital.filmfolio.databinding.ActivityMainBinding;
 import com.rkdigital.filmfolio.model.Movie;
+import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.storage.FirebaseReminderHelper;
 import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.MovieAdapter;
 import com.rkdigital.filmfolio.viewmodel.MainActivityViewModel;
+import com.rkdigital.filmfolio.viewmodel.MyViewModel;
+import com.rkdigital.filmfolio.viewmodel.MyViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView userName;
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-
+    private MyViewModel myViewModel;
 
     private boolean[] selectedFilters;
     private ArrayList<String> chosenFilters = new ArrayList<>();
@@ -70,6 +74,15 @@ public class MainActivity extends AppCompatActivity {
                 .get(MainActivityViewModel.class);
 
         getMovies();
+
+
+
+//        myViewModel = new ViewModelProvider(this).get(MyViewModel.class);
+
+        MyViewModelFactory factory = new MyViewModelFactory(getApplication(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1"));
+        myViewModel = new ViewModelProvider(this, factory).get(MyViewModel.class);
+
+
 
         swipeRefreshLayout = binding.swipeLayout;
         swipeRefreshLayout.setColorSchemeResources(R.color.black);

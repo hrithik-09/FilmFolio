@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
@@ -42,6 +44,7 @@ import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.CastAdapter;
 import com.rkdigital.filmfolio.viewmodel.MovieAboutViewModel;
 import com.rkdigital.filmfolio.viewmodel.MyViewModel;
+import com.rkdigital.filmfolio.viewmodel.MyViewModelFactory;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -49,6 +52,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import android.Manifest;
 
@@ -58,7 +64,7 @@ public class MovieAbout extends AppCompatActivity {
     private static final int REQUEST_CODE_POST_NOTIFICATIONS = 1001;
 
     private ImageView ivPoster;
-    private TextView tvTitle, tvTagline, tvMeta, tvOverview, tvLanguage, tvBudget, tvRevenue, tvStatus, tvHomepage,tvRating,tvRuntime,tvReleaseDate;
+    private TextView tvTitle, tvTagline, tvOverview, tvLanguage, tvBudget, tvRevenue, tvStatus, tvHomepage,tvRating,tvRuntime,tvReleaseDate;
     private ChipGroup chipGenres;
     private LinearLayout layoutProductionCompanies;
     private RecyclerView rvCast;
@@ -70,7 +76,8 @@ public class MovieAbout extends AppCompatActivity {
     private Reminder currentReminder;
     private CountDownTimer countDownTimer;
     private String movieTitle;
-
+    ExecutorService executor;
+    Handler handler;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -90,6 +97,13 @@ public class MovieAbout extends AppCompatActivity {
         setContentView(R.layout.activity_movie_about);
         sharedPreferencesHelper = SharedPreferencesHelper.getInstance(this);
 
+
+        //  Used for background database operation
+        executor= Executors.newSingleThreadExecutor();
+
+        //  Used for updating the UI
+        handler=new Handler(Looper.getMainLooper());
+
         movieId = getIntent().getIntExtra("movie_id", -1);
         if (movieId == -1) {
             Toast.makeText(this, "Movie ID not found!", Toast.LENGTH_SHORT).show();
@@ -101,23 +115,21 @@ public class MovieAbout extends AppCompatActivity {
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication()))
                 .get(MovieAboutViewModel.class);
 
-//        viewModel.getMovieDetails(movieId).observe(this, this::updateUI);
-
         setupListeners();
-        myViewModel = new ViewModelProvider(this).get(MyViewModel.class);
-        userId = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"User Id");
-
         viewModel.getMovieDetails(movieId).observe(this, movie -> {
             movieTitle = movie.getTitle(); // store title for reminder
             updateUI(movie);              // update UI
         });
+        userId = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1");
+        MyViewModelFactory factory = new MyViewModelFactory(getApplication(), userId);
+        myViewModel = new ViewModelProvider(this, factory).get(MyViewModel.class);
+
         myViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
             currentReminder = reminder;
             updateReminderButtonUI();
         });
 
     }
-
     private void initViews() {
         ivPoster = findViewById(R.id.ivPoster);
         tvTitle = findViewById(R.id.tvTitle);
@@ -125,7 +137,6 @@ public class MovieAbout extends AppCompatActivity {
         tvRating=findViewById(R.id.tvRating);
         tvRuntime=findViewById(R.id.tvRuntime);
         tvReleaseDate=findViewById(R.id.tvReleaseDate);
-//        tvMeta = findViewById(R.id.tvMeta);
         tvOverview = findViewById(R.id.tvOverview);
         tvLanguage = findViewById(R.id.tvLanguage);
         tvBudget = findViewById(R.id.tvBudget);
@@ -147,6 +158,14 @@ public class MovieAbout extends AppCompatActivity {
                 startCountdown(millisUntilReminder);
             } else {
                 btnSetReminder.setText("Reminder Expired");
+                // Auto-delete expired reminders
+                executor.execute(() -> {
+                    myViewModel.deleteReminder(currentReminder);
+                    handler.post(() -> {
+                        currentReminder = null;
+                        btnSetReminder.setText("Set Reminder");
+                    });
+                });
             }
         } else {
             btnSetReminder.setText("Set Reminder");
@@ -193,10 +212,25 @@ public class MovieAbout extends AppCompatActivity {
                     if (which == 0) {
                         showDateTimePicker(); // Edit
                     } else {
+                        btnSetReminder.setText("Deleting...");
+                        btnSetReminder.setEnabled(false);
+
+                        // Observe the LiveData to know when deletion is complete
+                        myViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
+                            if (reminder == null) {
+                                // Deletion complete
+                                currentReminder = null;
+                                btnSetReminder.setText("Set Reminder");
+                                btnSetReminder.setEnabled(true);
+                                if (countDownTimer != null) countDownTimer.cancel();
+
+                                // Remove this temporary observer
+                                myViewModel.getReminderByMovie(movieId, userId).removeObservers(this);
+                            }
+                        });
+
+                        // Initiate deletion
                         myViewModel.deleteReminder(currentReminder);
-                        currentReminder = null;
-                        btnSetReminder.setText("Set Reminder");
-                        if (countDownTimer != null) countDownTimer.cancel();
                     }
                 }).show();
     }
@@ -334,7 +368,11 @@ public class MovieAbout extends AppCompatActivity {
 
         Reminder newReminder = new Reminder();
         if (currentReminder != null) {
-            newReminder.setId(currentReminder.getId());
+            newReminder.setReminderId(currentReminder.getReminderId());
+        }
+        else
+        {
+            newReminder.setReminderId(UUID.randomUUID().toString());
         }
         newReminder.setMovieId(movieId);
         newReminder.setMovieTitle(movieTitle);
