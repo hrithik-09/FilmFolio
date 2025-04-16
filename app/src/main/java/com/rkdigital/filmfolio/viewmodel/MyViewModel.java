@@ -14,10 +14,11 @@ import java.util.List;
 public class MyViewModel extends AndroidViewModel {
     private ReminderRepository reminderRepository;
 
-    public MyViewModel(@NonNull Application application) {
+    public MyViewModel(@NonNull Application application, String userId) {
         super(application);
-        this.reminderRepository = new ReminderRepository(application);
+        this.reminderRepository = new ReminderRepository(application, userId);
     }
+
 
     public LiveData<List<Reminder>>getReminderByUser(String userId)
     {
@@ -25,10 +26,10 @@ public class MyViewModel extends AndroidViewModel {
     }
     public void addNewReminder(Reminder reminder)
     {
-        reminderRepository.insertReminder(reminder);
+        reminderRepository.syncReminder(reminder);
     }
     public void updateReminder(Reminder reminder){
-        reminderRepository.updateReminder(reminder);
+        reminderRepository.syncReminder(reminder);
     }
 
     public void deleteReminder(Reminder reminder)

@@ -58,7 +58,7 @@ dependencies {
     implementation ("androidx.credentials:credentials-play-services-auth:1.2.2")
     implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.credentials:credentials:1.5.0-rc01") // Latest Credential Manager API
-
+    implementation ("com.google.firebase:firebase-firestore:24.10.1")
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")

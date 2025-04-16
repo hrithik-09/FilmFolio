@@ -1,5 +1,6 @@
 package com.rkdigital.filmfolio;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,6 +11,7 @@ import android.os.Build;
 
 import com.rkdigital.filmfolio.model.Reminder;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ReminderScheduler {
@@ -41,16 +43,19 @@ public class ReminderScheduler {
         }
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private static void scheduleExactTimeAlarm(Context context, Reminder reminder) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, ReminderReceiver.class);
-        intent.putExtra("reminder_id", reminder.getId());
+        intent.putExtra("reminder_id", reminder.getReminderId());
         intent.putExtra("movie_title", reminder.getMovieTitle());
         intent.putExtra("is_exact_time", true);
 
+        // Alternative more robust request code generation
+        int requestCode = Objects.hash(ALARM_ID, reminder.getReminderId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                ALARM_ID + reminder.getId(),
+                requestCode,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -67,16 +72,17 @@ public class ReminderScheduler {
         }
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private static void scheduleOneHourPriorNotification(Context context, Reminder reminder) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, ReminderReceiver.class);
-        intent.putExtra("reminder_id", reminder.getId());
+        intent.putExtra("reminder_id", reminder.getReminderId());
         intent.putExtra("movie_title", reminder.getMovieTitle());
         intent.putExtra("is_exact_time", false);
-
+        int requestCode = Objects.hash(NOTIFICATION_ID, reminder.getReminderId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                NOTIFICATION_ID + reminder.getId(),
+                requestCode,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -94,6 +100,22 @@ public class ReminderScheduler {
                     pendingIntent);
         }
     }
+    public static void cancelReminder(Context context, String reminderId) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // Cancel exact time alarm
+        int alarmRequestCode = ALARM_ID + reminderId.hashCode();
+        Intent alarmIntent = new Intent(context, ReminderReceiver.class);
+        PendingIntent.getBroadcast(context, alarmRequestCode, alarmIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE).cancel();
+
+        // Cancel 1-hour prior notification
+        int notificationRequestCode = NOTIFICATION_ID + reminderId.hashCode();
+        Intent notificationIntent = new Intent(context, ReminderReceiver.class);
+        PendingIntent.getBroadcast(context, notificationRequestCode, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE).cancel();
+    }
+
 }
 
 

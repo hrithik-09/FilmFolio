@@ -17,6 +17,9 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders WHERE userId = :userId")
     LiveData<List<Reminder>> getRemindersByUser(String userId);
 
+    @Query("SELECT * FROM reminders WHERE reminderId = :reminderId")
+    Reminder getReminderById(String reminderId);
+
     @Query("SELECT * FROM reminders WHERE movieId = :movieId AND userId = :userId")
     LiveData<Reminder> getReminderForMovie(int movieId, String userId);
 
