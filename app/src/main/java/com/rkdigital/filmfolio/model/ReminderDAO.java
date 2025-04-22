@@ -28,4 +28,7 @@ public interface ReminderDAO {
 
     @Update
     void updateReminder(Reminder reminder);
+
+    @Query("DELETE FROM reminders")
+    void deleteAllReminder();
 }

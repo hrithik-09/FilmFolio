@@ -11,10 +11,10 @@ import com.rkdigital.filmfolio.model.ReminderRepository;
 
 import java.util.List;
 
-public class MyViewModel extends AndroidViewModel {
+public class ReminderViewModel extends AndroidViewModel {
     private ReminderRepository reminderRepository;
 
-    public MyViewModel(@NonNull Application application, String userId) {
+    public ReminderViewModel(@NonNull Application application, String userId) {
         super(application);
         this.reminderRepository = new ReminderRepository(application, userId);
     }
@@ -38,5 +38,12 @@ public class MyViewModel extends AndroidViewModel {
     }
     public LiveData<Reminder>getReminderByMovie(int movieId,String userid){
         return reminderRepository.getReminderForMovie(movieId,userid);
+    }
+    public void clearReminderListener()
+    {
+        reminderRepository.clearListener();
+    }
+    public void clearLocalReminder(){
+        reminderRepository.clearLocalReminders();
     }
 }

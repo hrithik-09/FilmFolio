@@ -1,4 +1,4 @@
-package com.rkdigital.filmfolio;
+package com.rkdigital.filmfolio.reminder;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,8 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
+
+import com.rkdigital.filmfolio.R;
 
 public class ReminderReceiver extends BroadcastReceiver {
     @Override

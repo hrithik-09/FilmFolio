@@ -192,9 +192,11 @@
                 <!-- Logout Option -->
                 <TextView
                     android:id="@+id/logout"
-                    android:layout_width="match_parent"
+                    android:drawableEnd="@drawable/ic_logout"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Logout"
+                    android:drawablePadding="10dp"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:paddingTop="16dp"/>

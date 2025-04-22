@@ -3,7 +3,6 @@ package com.rkdigital.filmfolio;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -21,15 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,11 +35,12 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.rkdigital.filmfolio.model.MovieDetail;
 import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.reminder.ReminderScheduler;
 import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.CastAdapter;
 import com.rkdigital.filmfolio.viewmodel.MovieAboutViewModel;
-import com.rkdigital.filmfolio.viewmodel.MyViewModel;
-import com.rkdigital.filmfolio.viewmodel.MyViewModelFactory;
+import com.rkdigital.filmfolio.viewmodel.ReminderViewModel;
+import com.rkdigital.filmfolio.viewmodel.ReminderViewModelFactory;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -70,7 +66,7 @@ public class MovieAbout extends AppCompatActivity {
     private RecyclerView rvCast;
     private SharedPreferencesHelper sharedPreferencesHelper;
     private MaterialButton btnWishlist, btnSetReminder;
-    private MyViewModel myViewModel;
+    private ReminderViewModel reminderViewModel;
     private String userId;
     private int movieId;
     private Reminder currentReminder;
@@ -121,10 +117,10 @@ public class MovieAbout extends AppCompatActivity {
             updateUI(movie);              // update UI
         });
         userId = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1");
-        MyViewModelFactory factory = new MyViewModelFactory(getApplication(), userId);
-        myViewModel = new ViewModelProvider(this, factory).get(MyViewModel.class);
+        ReminderViewModelFactory factory = new ReminderViewModelFactory(getApplication(), userId);
+        reminderViewModel = new ViewModelProvider(this, factory).get(ReminderViewModel.class);
 
-        myViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
+        reminderViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
             currentReminder = reminder;
             updateReminderButtonUI();
         });
@@ -160,7 +156,7 @@ public class MovieAbout extends AppCompatActivity {
                 btnSetReminder.setText("Reminder Expired");
                 // Auto-delete expired reminders
                 executor.execute(() -> {
-                    myViewModel.deleteReminder(currentReminder);
+                    reminderViewModel.deleteReminder(currentReminder);
                     handler.post(() -> {
                         currentReminder = null;
                         btnSetReminder.setText("Set Reminder");
@@ -216,7 +212,7 @@ public class MovieAbout extends AppCompatActivity {
                         btnSetReminder.setEnabled(false);
 
                         // Observe the LiveData to know when deletion is complete
-                        myViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
+                        reminderViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
                             if (reminder == null) {
                                 // Deletion complete
                                 currentReminder = null;
@@ -225,12 +221,12 @@ public class MovieAbout extends AppCompatActivity {
                                 if (countDownTimer != null) countDownTimer.cancel();
 
                                 // Remove this temporary observer
-                                myViewModel.getReminderByMovie(movieId, userId).removeObservers(this);
+                                reminderViewModel.getReminderByMovie(movieId, userId).removeObservers(this);
                             }
                         });
 
                         // Initiate deletion
-                        myViewModel.deleteReminder(currentReminder);
+                        reminderViewModel.deleteReminder(currentReminder);
                     }
                 }).show();
     }
@@ -380,9 +376,9 @@ public class MovieAbout extends AppCompatActivity {
         newReminder.setUserId(userId);
 
         if (currentReminder != null) {
-            myViewModel.updateReminder(newReminder);
+            reminderViewModel.updateReminder(newReminder);
         } else {
-            myViewModel.addNewReminder(newReminder);
+            reminderViewModel.addNewReminder(newReminder);
         }
 
         // Schedule the reminders

@@ -4,14 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.rkdigital.filmfolio.ReminderScheduler;
+import com.rkdigital.filmfolio.reminder.ReminderScheduler;
 import com.rkdigital.filmfolio.storage.FirebaseReminderHelper;
 
 import java.util.List;
@@ -76,6 +74,7 @@ public class ReminderRepository {
     public void clearListener() {
         if (firebaseListener != null) {
             firebaseListener.remove();
+            firebaseListener = null;
         }
     }
 
@@ -90,8 +89,7 @@ public class ReminderRepository {
             FirebaseReminderHelper.uploadReminderToFirebase(reminder);
         });
     }
-    // In ReminderRepository.java
-    // In ReminderRepository
+
     public void deleteReminder(Reminder reminder) {
         executor.execute(() -> {
             // 1. Cancel alarms first
@@ -119,5 +117,10 @@ public class ReminderRepository {
         return reminderDao.getReminderForMovie(movieId,userId);
     }
 
+    public void clearLocalReminders(){
+        executor.execute(() -> {
+            reminderDao.deleteAllReminder();
+        });
+    }
 
 }

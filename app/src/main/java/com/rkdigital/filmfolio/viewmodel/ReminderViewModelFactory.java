@@ -6,10 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-public class MyViewModelFactory implements ViewModelProvider.Factory{
+public class ReminderViewModelFactory implements ViewModelProvider.Factory{
     private final Application application;
     private final String userId;
-    public MyViewModelFactory(Application application, String userId) {
+    public ReminderViewModelFactory(Application application, String userId) {
         this.application = application;
         this.userId = userId;
     }
@@ -17,8 +17,8 @@ public class MyViewModelFactory implements ViewModelProvider.Factory{
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(MyViewModel.class)) {
-            return (T) new MyViewModel(application, userId);
+        if (modelClass.isAssignableFrom(ReminderViewModel.class)) {
+            return (T) new ReminderViewModel(application, userId);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

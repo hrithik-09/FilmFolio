@@ -1,4 +1,4 @@
-package com.rkdigital.filmfolio;
+package com.rkdigital.filmfolio.reminder;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -12,7 +12,6 @@ import android.os.Build;
 import com.rkdigital.filmfolio.model.Reminder;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 public class ReminderScheduler {
     private static final String CHANNEL_ID = "movie_reminder_channel";

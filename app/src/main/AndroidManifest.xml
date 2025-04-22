@@ -20,7 +20,7 @@
         tools:targetApi="31">
 
         <receiver
-            android:name=".ReminderReceiver"
+            android:name=".reminder.ReminderReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -28,7 +28,7 @@
         </receiver>
 
         <receiver
-            android:name=".DismissReceiver"
+            android:name=".reminder.DismissReceiver"
             android:exported="false" />
 
         <activity

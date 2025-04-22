@@ -1,13 +1,12 @@
 package com.rkdigital.filmfolio;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -26,15 +25,16 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.firebase.auth.FirebaseAuth;
 import com.rkdigital.filmfolio.databinding.ActivityMainBinding;
 import com.rkdigital.filmfolio.model.Movie;
-import com.rkdigital.filmfolio.model.Reminder;
-import com.rkdigital.filmfolio.storage.FirebaseReminderHelper;
 import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.MovieAdapter;
 import com.rkdigital.filmfolio.viewmodel.MainActivityViewModel;
-import com.rkdigital.filmfolio.viewmodel.MyViewModel;
-import com.rkdigital.filmfolio.viewmodel.MyViewModelFactory;
+import com.rkdigital.filmfolio.viewmodel.ReminderViewModel;
+import com.rkdigital.filmfolio.viewmodel.ReminderViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferencesHelper sharedPreferencesHelper;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
-    private TextView userName;
+    private TextView userName,logoutButton;
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-    private MyViewModel myViewModel;
+    private ReminderViewModel reminderViewModel;
 
     private boolean[] selectedFilters;
     private ArrayList<String> chosenFilters = new ArrayList<>();
@@ -70,19 +70,14 @@ public class MainActivity extends AppCompatActivity {
                 R.layout.activity_main
         );
 
-        viewModel = new ViewModelProvider(this)
-                .get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+
+        initUI();
 
         getMovies();
 
-
-
-//        myViewModel = new ViewModelProvider(this).get(MyViewModel.class);
-
-        MyViewModelFactory factory = new MyViewModelFactory(getApplication(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1"));
-        myViewModel = new ViewModelProvider(this, factory).get(MyViewModel.class);
-
-
+        ReminderViewModelFactory factory = new ReminderViewModelFactory(getApplication(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1"));
+        reminderViewModel = new ViewModelProvider(this, factory).get(ReminderViewModel.class);
 
         swipeRefreshLayout = binding.swipeLayout;
         swipeRefreshLayout.setColorSchemeResources(R.color.black);
@@ -93,13 +88,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        etSearch = findViewById(R.id.etSearch);
-        ivSearch = findViewById(R.id.ivSearch);
-        userName = findViewById(R.id.userName);
-        filterIcon =  findViewById(R.id.ivFilter);
-        filterOptions = getResources().getStringArray(R.array.filter_options);
-        selectedFilters = new boolean[filterOptions.length];
+        setupClickListeners();
 
+        setupLiveSearch();
+    }
+    private void setupClickListeners(){
         filterIcon.setOnClickListener(v -> {
             if (getSupportFragmentManager().findFragmentByTag("FilterBottomSheet") != null) {
                 return;
@@ -109,9 +102,6 @@ public class MainActivity extends AppCompatActivity {
             });
             filterDialog.show(getSupportFragmentManager(), "FilterBottomSheet");
         });
-
-        String user = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_NAME,"User Name");
-        userName.setText(user);
 
         ivSearch.setOnClickListener(v -> {
             if (etSearch.getVisibility() == View.GONE) {
@@ -134,25 +124,49 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setupLiveSearch();
-        toggle=findViewById(R.id.ivHamburger);
-        drawerLayout=findViewById(R.id.drawer_layout);
         toggle.setOnClickListener(view -> {
             drawerLayout.openDrawer(GravityCompat.START);
 
         });
 
-    }
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    "reminder_channel", "Reminders", NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("Channel for movie reminders");
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
-    }
+        logoutButton.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Identity.getSignInClient(getApplicationContext()).signOut()
+                    .addOnSuccessListener(unused -> Log.d("Logout", "Signed out of Google"))
+                    .addOnFailureListener(e -> Log.e("Logout", "Google Sign-Out failed", e));
 
+            // 2. Clear SharedPrefs
+            sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getDevicePrefs());
+            sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getUserPrefs());
+            sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getAppPrefs());
+
+            // 3. Stop sync listener
+            reminderViewModel.clearReminderListener();
+
+            reminderViewModel.clearLocalReminder();
+
+            // 4. Navigate to Login
+            Intent intent = new Intent(this, LoginScreen.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+    }
+    private void initUI()
+    {
+        etSearch = findViewById(R.id.etSearch);
+        ivSearch = findViewById(R.id.ivSearch);
+        logoutButton = findViewById(R.id.logout);
+        filterIcon =  findViewById(R.id.ivFilter);
+        filterOptions = getResources().getStringArray(R.array.filter_options);
+        selectedFilters = new boolean[filterOptions.length];
+        toggle=findViewById(R.id.ivHamburger);
+        drawerLayout=findViewById(R.id.drawer_layout);
+        userName = findViewById(R.id.userName);
+        String user = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_NAME,"User Name");
+        userName.setText(user);
+    }
     private void setupLiveSearch() {
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
