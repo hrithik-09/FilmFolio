@@ -59,7 +59,7 @@ public class MovieAbout extends AppCompatActivity {
     private MovieAboutViewModel viewModel;
     private static final int REQUEST_CODE_POST_NOTIFICATIONS = 1001;
 
-    private ImageView ivPoster;
+    private ImageView ivPoster,goBack;
     private TextView tvTitle, tvTagline, tvOverview, tvLanguage, tvBudget, tvRevenue, tvStatus, tvHomepage,tvRating,tvRuntime,tvReleaseDate;
     private ChipGroup chipGenres;
     private LinearLayout layoutProductionCompanies;
@@ -125,8 +125,12 @@ public class MovieAbout extends AppCompatActivity {
             updateReminderButtonUI();
         });
 
+
+
+
     }
     private void initViews() {
+        goBack=findViewById(R.id.goBack);
         ivPoster = findViewById(R.id.ivPoster);
         tvTitle = findViewById(R.id.tvTitle);
         tvTagline = findViewById(R.id.tvTagline);
@@ -192,6 +196,11 @@ public class MovieAbout extends AppCompatActivity {
         btnWishlist.setOnClickListener(v ->
                 Toast.makeText(this, "Added to Wishlist (functionality coming soon)", Toast.LENGTH_SHORT).show());
 
+        goBack.setOnClickListener(v ->
+        {
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        });
         btnSetReminder.setOnClickListener(v -> {
             if (currentReminder != null) {
                 showReminderOptionsDialog();
@@ -394,6 +403,11 @@ public class MovieAbout extends AppCompatActivity {
             countDownTimer.cancel();
         }
         super.onDestroy();
+    }
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
 

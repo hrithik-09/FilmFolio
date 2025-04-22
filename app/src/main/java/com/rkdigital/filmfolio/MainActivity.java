@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferencesHelper sharedPreferencesHelper;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
+    private boolean doubleBackToExitPressedOnce=false;
     private TextView userName,logoutButton;
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
@@ -205,7 +207,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce){
+            super.onBackPressed();
+            return;
+        }
+        this.doubleBackToExitPressedOnce=true;
+        Toast.makeText(this,"Press back again to exit", Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(()->doubleBackToExitPressedOnce=false,5000);
+    }
     private void displayMoviesInRecyclerView() {
         recyclerView = binding.recyclerview;
 

@@ -9,6 +9,7 @@ import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class LoginScreen extends AppCompatActivity implements SharedPreferenceOb
     private SignInClient signInClient;
     private ExecutorService executorService;
     LinearLayout googleSignInButton;
+    private boolean doubleBackToExitPressedOnce=false;
     private ActivityResultLauncher<IntentSenderRequest> googleSignInLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +106,17 @@ public class LoginScreen extends AppCompatActivity implements SharedPreferenceOb
         super.onDestroy();
         SharedPreferenceObserver.getInstance(this).removeObserver(this);
         executorService.shutdown();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce){
+            super.onBackPressed();
+            return;
+        }
+        this.doubleBackToExitPressedOnce=true;
+        Toast.makeText(this,"Press back again to exit", Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(()->doubleBackToExitPressedOnce=false,5000);
     }
 
 }
