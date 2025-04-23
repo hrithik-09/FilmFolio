@@ -2,6 +2,7 @@ package com.rkdigital.filmfolio;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -16,7 +17,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.credentials.ClearCredentialStateRequest;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.exceptions.ClearCredentialException;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
@@ -132,27 +138,47 @@ public class MainActivity extends AppCompatActivity {
         });
 
         logoutButton.setOnClickListener(view -> {
+            // Firebase sign-out
             FirebaseAuth.getInstance().signOut();
-            Identity.getSignInClient(getApplicationContext()).signOut()
-                    .addOnSuccessListener(unused -> Log.d("Logout", "Signed out of Google"))
-                    .addOnFailureListener(e -> Log.e("Logout", "Google Sign-Out failed", e));
 
-            // 2. Clear SharedPrefs
+            // Clear Google sign-in state
+            CredentialManager credentialManager = CredentialManager.create(getApplicationContext());
+            ClearCredentialStateRequest clearRequest = new ClearCredentialStateRequest(); // ✅ No need for token
+            CancellationSignal cancellationSignal = new CancellationSignal();
+
+            credentialManager.clearCredentialStateAsync(
+                    clearRequest,
+                    cancellationSignal,
+                    ContextCompat.getMainExecutor(this),
+                    new CredentialManagerCallback<Void, ClearCredentialException>() {
+                        @Override
+                        public void onResult(Void result) {
+                            Log.d("Logout", "Credential state cleared");
+                        }
+
+                        @Override
+                        public void onError(ClearCredentialException e) {
+                            Log.e("Logout", "Failed to clear credential state", e);
+                        }
+                    }
+            );
+
+            // Clear SharedPrefs
             sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getDevicePrefs());
             sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getUserPrefs());
             sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getAppPrefs());
 
-            // 3. Stop sync listener
+            // stop sync listener
             reminderViewModel.clearReminderListener();
-
             reminderViewModel.clearLocalReminder();
 
-            // 4. Navigate to Login
+            //  Navigate to Login
             Intent intent = new Intent(this, LoginScreen.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         });
+
 
     }
     private void initUI()
