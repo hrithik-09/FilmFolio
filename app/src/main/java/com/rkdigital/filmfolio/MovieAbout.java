@@ -1,5 +1,9 @@
 package com.rkdigital.filmfolio;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -14,7 +18,9 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,12 +41,15 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.rkdigital.filmfolio.model.MovieDetail;
 import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.model.Wishlist;
 import com.rkdigital.filmfolio.reminder.ReminderScheduler;
 import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.CastAdapter;
 import com.rkdigital.filmfolio.viewmodel.MovieAboutViewModel;
 import com.rkdigital.filmfolio.viewmodel.ReminderViewModel;
 import com.rkdigital.filmfolio.viewmodel.ReminderViewModelFactory;
+import com.rkdigital.filmfolio.viewmodel.WishlistViewModel;
+import com.rkdigital.filmfolio.viewmodel.WishlistViewModelFactory;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -55,10 +64,8 @@ import java.util.concurrent.TimeUnit;
 import android.Manifest;
 
 public class MovieAbout extends AppCompatActivity {
-
     private MovieAboutViewModel viewModel;
     private static final int REQUEST_CODE_POST_NOTIFICATIONS = 1001;
-
     private ImageView ivPoster,goBack;
     private TextView tvTitle, tvTagline, tvOverview, tvLanguage, tvBudget, tvRevenue, tvStatus, tvHomepage,tvRating,tvRuntime,tvReleaseDate;
     private ChipGroup chipGenres;
@@ -96,7 +103,6 @@ public class MovieAbout extends AppCompatActivity {
         setContentView(R.layout.activity_movie_about);
         sharedPreferencesHelper = SharedPreferencesHelper.getInstance(this);
 
-
         //  Used for background database operation
         executor= Executors.newSingleThreadExecutor();
 
@@ -116,7 +122,7 @@ public class MovieAbout extends AppCompatActivity {
 
         setupListeners();
         viewModel.getMovieDetails(movieId).observe(this, movie -> {
-            movieTitle = movie.getTitle(); // store title for reminder
+            movieTitle = movie.getTitle()!=null?movie.getTitle():"Movie Title"; // store title for reminder
             updateUI(movie);              // update UI
         });
         userId = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1");
@@ -124,6 +130,10 @@ public class MovieAbout extends AppCompatActivity {
         reminderViewModel = new ViewModelProvider(this, factory).get(ReminderViewModel.class);
 
         reminderViewModel.getReminderByMovie(movieId, userId).observe(this, reminder -> {
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+                countDownTimer = null;
+            }
             currentReminder = reminder;
             updateReminderButtonUI();
         });
@@ -224,6 +234,10 @@ public class MovieAbout extends AppCompatActivity {
         if (currentReminder != null) {
             long millisUntilReminder = currentReminder.getReminderTimeMillis() - System.currentTimeMillis();
             if (millisUntilReminder > 0) {
+                // Cancel any existing timer before starting new one
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
                 btnSetReminder.setText(formatMillis(millisUntilReminder));
                 startCountdown(millisUntilReminder);
             } else {
@@ -231,13 +245,14 @@ public class MovieAbout extends AppCompatActivity {
                 // Auto-delete expired reminders
                 executor.execute(() -> {
                     reminderViewModel.deleteReminder(currentReminder);
-                    handler.post(() -> {
-                        currentReminder = null;
-                        btnSetReminder.setText("Set Reminder");
-                    });
                 });
             }
         } else {
+            // Ensure complete cleanup when reminder is deleted
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+                countDownTimer = null;
+            }
             btnSetReminder.setText("Set Reminder");
         }
     }
@@ -249,14 +264,24 @@ public class MovieAbout extends AppCompatActivity {
     }
 
     private void startCountdown(long millis) {
-        if (countDownTimer != null) countDownTimer.cancel();
+        // Always cancel previous timer
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+
         countDownTimer = new CountDownTimer(millis, 1000) {
             public void onTick(long millisUntilFinished) {
-                btnSetReminder.setText(formatMillis(millisUntilFinished));
+                // Only update if we still have a valid reminder
+                if (currentReminder != null) {
+                    btnSetReminder.setText(formatMillis(millisUntilFinished));
+                }
             }
 
             public void onFinish() {
-                btnSetReminder.setText("Reminder Expired");
+                // Only update if we still have a valid reminder
+                if (currentReminder != null) {
+                    btnSetReminder.setText("Reminder Expired");
+                }
             }
         }.start();
     }
@@ -305,8 +330,8 @@ public class MovieAbout extends AppCompatActivity {
                             }
                         });
 
-                        // Initiate deletion
                         reminderViewModel.deleteReminder(currentReminder);
+
                     }
                 }).show();
     }

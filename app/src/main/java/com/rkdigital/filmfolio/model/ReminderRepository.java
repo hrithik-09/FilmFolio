@@ -39,7 +39,7 @@ public class ReminderRepository {
         // Start real-time sync listener
         listenToFirebaseUpdates();
     }
-    // In ReminderRepository.java
+
     private void listenToFirebaseUpdates() {
         firebaseListener = FirebaseReminderHelper.listenToRemindersForUser(currentUserId, (snapshots, error) -> {
             executor.execute(() -> {

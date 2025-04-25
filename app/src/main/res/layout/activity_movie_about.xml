@@ -328,19 +328,24 @@
         android:gravity="center"
         android:outlineProvider="bounds">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnWishlist"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="48dp"
-        android:text="Add to Wishlist"
-        android:textColor="#FF4D4D"
-        android:textSize="14sp"
-        app:strokeColor="#FF4D4D"
-        app:strokeWidth="1dp"
-        android:layout_marginEnd="8dp"
-        app:cornerRadius="24dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnWishlist"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:text="Like"
+            android:textColor="#FF4D4D"
+            android:textSize="14sp"
+            app:icon="@drawable/ic_heart_outline"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconTint="#FF4D4D"
+            app:strokeColor="#FF4D4D"
+            app:strokeWidth="1dp"
+            android:layout_marginEnd="8dp"
+            app:cornerRadius="24dp"
+            android:stateListAnimator="@null"/> <!-- Disable default elevation animation -->
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSetReminder"
