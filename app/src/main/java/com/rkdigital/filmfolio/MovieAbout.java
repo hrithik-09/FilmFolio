@@ -67,13 +67,16 @@ public class MovieAbout extends AppCompatActivity {
     private SharedPreferencesHelper sharedPreferencesHelper;
     private MaterialButton btnWishlist, btnSetReminder;
     private ReminderViewModel reminderViewModel;
+    private WishlistViewModel wishlistViewModel;
     private String userId;
     private int movieId;
+    private Wishlist currentwishlist;
     private Reminder currentReminder;
     private CountDownTimer countDownTimer;
     private String movieTitle;
     ExecutorService executor;
     Handler handler;
+    private AnimatorSet animatorSet;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -126,6 +129,16 @@ public class MovieAbout extends AppCompatActivity {
         });
 
 
+        WishlistViewModelFactory wishlistViewModelFactory = new WishlistViewModelFactory(getApplication(),userId);
+        wishlistViewModel = new ViewModelProvider(this,wishlistViewModelFactory).get(WishlistViewModel.class);
+
+        wishlistViewModel.getWishlistByMovie(movieId,userId).observe(this,wishlist -> {
+            currentwishlist = wishlist;
+            updateWishlistButtonUI();
+            btnWishlist.setEnabled(true);
+            btnWishlist.setIconResource(wishlist != null ?
+                    R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
+        });
 
 
     }
@@ -149,7 +162,64 @@ public class MovieAbout extends AppCompatActivity {
         btnWishlist = findViewById(R.id.btnWishlist);
         btnSetReminder = findViewById(R.id.btnSetReminder);
     }
+    private void updateWishlistButtonUI() {
+        if (currentwishlist != null) {
+            // Already in wishlist - show filled heart with animation
+            animateWishlistButton(true);
+        } else {
+            // Not in wishlist - show outline heart
+            animateWishlistButton(false);
+        }
+    }
 
+    private void animateWishlistButton(boolean isLiked) {
+        btnWishlist.clearAnimation();
+
+        // Bounce animation
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(btnWishlist, "scaleX", 0.9f, 1.1f, 1f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(btnWishlist, "scaleY", 0.9f, 1.1f, 1f);
+
+        if (animatorSet == null) {
+            animatorSet = new AnimatorSet();
+        }
+        else
+            animatorSet.cancel();
+        animatorSet.playTogether(scaleX, scaleY);
+        animatorSet.setDuration(200);
+        animatorSet.setInterpolator(new OvershootInterpolator());
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                btnWishlist.setIconResource(isLiked ?
+                        R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
+                btnWishlist.setText(isLiked ? "Liked" : "Like");
+            }
+        });
+
+        animatorSet.start();
+
+        // Haptic feedback
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            btnWishlist.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
+        }
+    }
+
+    private void createOrDeleteWishlist() {
+        btnWishlist.setEnabled(false);
+
+        if (currentwishlist != null) {
+            // Delete existing wishlist
+            wishlistViewModel.deleteWishlist(currentwishlist);
+        } else {
+            // Create new wishlist
+            Wishlist newWishlist = new Wishlist();
+            newWishlist.setWishlistId(UUID.randomUUID().toString());
+            newWishlist.setUserId(userId);
+            newWishlist.setMovieId(movieId);
+            wishlistViewModel.addNewWishlist(newWishlist);
+        }
+    }
     private void updateReminderButtonUI() {
         if (currentReminder != null) {
             long millisUntilReminder = currentReminder.getReminderTimeMillis() - System.currentTimeMillis();
@@ -193,9 +263,10 @@ public class MovieAbout extends AppCompatActivity {
 
 
     private void setupListeners() {
-        btnWishlist.setOnClickListener(v ->
-                Toast.makeText(this, "Added to Wishlist (functionality coming soon)", Toast.LENGTH_SHORT).show());
-
+        btnWishlist.setOnClickListener(v -> {
+            animateWishlistButton(currentwishlist == null);
+            createOrDeleteWishlist();
+        });
         goBack.setOnClickListener(v ->
         {
             finish();
