@@ -36,6 +36,7 @@ import com.rkdigital.filmfolio.model.Movie;
 import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.view.MovieAdapter;
 import com.rkdigital.filmfolio.viewmodel.MainActivityViewModel;
+import com.rkdigital.filmfolio.viewmodel.MainActivityViewModelFactory;
 import com.rkdigital.filmfolio.viewmodel.ReminderViewModel;
 import com.rkdigital.filmfolio.viewmodel.ReminderViewModelFactory;
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] filterOptions;
     private DrawerLayout drawerLayout;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferencesHelper = SharedPreferencesHelper.getInstance(this);
@@ -73,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
                 this,
                 R.layout.activity_main
         );
-
-        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        MainActivityViewModelFactory factory2 = new MainActivityViewModelFactory(getApplication(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1"));
+        viewModel = new ViewModelProvider(this, factory2).get(MainActivityViewModel.class);
 
         initUI();
 
@@ -133,48 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        logoutButton.setOnClickListener(view -> {
-            // Firebase sign-out
-            FirebaseAuth.getInstance().signOut();
-
-            // Clear Google sign-in state
-            CredentialManager credentialManager = CredentialManager.create(getApplicationContext());
-            ClearCredentialStateRequest clearRequest = new ClearCredentialStateRequest(); // ✅ No need for token
-            CancellationSignal cancellationSignal = new CancellationSignal();
-
-            credentialManager.clearCredentialStateAsync(
-                    clearRequest,
-                    cancellationSignal,
-                    ContextCompat.getMainExecutor(this),
-                    new CredentialManagerCallback<Void, ClearCredentialException>() {
-                        @Override
-                        public void onResult(Void result) {
-                            Log.d("Logout", "Credential state cleared");
-                        }
-
-                        @Override
-                        public void onError(ClearCredentialException e) {
-                            Log.e("Logout", "Failed to clear credential state", e);
-                        }
-                    }
-            );
-
-            // Clear SharedPrefs
-            sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getDevicePrefs());
-            sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getUserPrefs());
-            sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getAppPrefs());
-
-            // stop sync listener
-            reminderViewModel.clearReminderListener();
-            reminderViewModel.clearLocalReminder();
-
-            //  Navigate to Login
-            Intent intent = new Intent(this, LoginScreen.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        });
-
+        logoutButton.setOnClickListener(view -> logout());
 
     }
     private void initUI()
@@ -190,6 +151,47 @@ public class MainActivity extends AppCompatActivity {
         userName = findViewById(R.id.userName);
         String user = sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_NAME,"User Name");
         userName.setText(user);
+    }
+
+    private void logout(){
+        FirebaseAuth.getInstance().signOut();
+
+        // Clear Google sign-in state
+        CredentialManager credentialManager = CredentialManager.create(getApplicationContext());
+        ClearCredentialStateRequest clearRequest = new ClearCredentialStateRequest(); // ✅ No need for token
+        CancellationSignal cancellationSignal = new CancellationSignal();
+
+        credentialManager.clearCredentialStateAsync(
+                clearRequest,
+                cancellationSignal,
+                ContextCompat.getMainExecutor(this),
+                new CredentialManagerCallback<Void, ClearCredentialException>() {
+                    @Override
+                    public void onResult(Void result) {
+                        Log.d("Logout", "Credential state cleared");
+                    }
+
+                    @Override
+                    public void onError(ClearCredentialException e) {
+                        Log.e("Logout", "Failed to clear credential state", e);
+                    }
+                }
+        );
+
+        // Clear SharedPrefs
+        sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getDevicePrefs());
+        sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getUserPrefs());
+        sharedPreferencesHelper.clearAll(sharedPreferencesHelper.getAppPrefs());
+
+        // stop sync listener
+        reminderViewModel.clearReminderListener();
+        reminderViewModel.clearLocalReminder();
+
+        //  Navigate to Login
+        Intent intent = new Intent(this, LoginScreen.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
     private void setupLiveSearch() {
         etSearch.addTextChangedListener(new TextWatcher() {
@@ -222,22 +224,37 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Movie> moviesFromLiveData) {
                 movies = (ArrayList<Movie>) moviesFromLiveData;
+
+                for (Movie movie : movies) {
+                    viewModel.getReminderByMovie(movie.getId(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1")).observe(MainActivity.this, reminder -> {
+                        if (reminder != null) {
+                            movie.setReminderSet(true);
+                        } else {
+                            movie.setReminderSet(false);
+                        }
+                        if (movieAdapter != null) {
+                            movieAdapter.notifyDataSetChanged();
+                        }
+
+                    });
+
+                    viewModel.getWishlistByMovie(movie.getId(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1")).observe(MainActivity.this, wishlist -> {
+                        if (wishlist != null) {
+                            movie.setWishlisted(true);
+                        } else {
+                            movie.setWishlisted(false);
+                        }
+                        if (movieAdapter != null) {
+                            movieAdapter.notifyDataSetChanged();
+                        }
+
+                    });
+                }
+
                 displayMoviesInRecyclerView();
                 recyclerView.scrollToPosition(0);
             }
         });
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce){
-            super.onBackPressed();
-            return;
-        }
-        this.doubleBackToExitPressedOnce=true;
-        Toast.makeText(this,"Press back again to exit", Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(()->doubleBackToExitPressedOnce=false,5000);
     }
     private void displayMoviesInRecyclerView() {
         recyclerView = binding.recyclerview;
@@ -261,5 +278,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
             movieAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce){
+            super.onBackPressed();
+            return;
+        }
+        this.doubleBackToExitPressedOnce=true;
+        Toast.makeText(this,"Press back again to exit", Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(()->doubleBackToExitPressedOnce=false,5000);
     }
 }

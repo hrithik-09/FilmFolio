@@ -42,6 +42,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = movieArrayList.get(position);
         holder.movieListItemBinding.setMovie(movie);
+        if (movie.hasReminder()) {
+            holder.movieListItemBinding.ivReminder.setVisibility(View.VISIBLE);
+        } else {
+            holder.movieListItemBinding.ivReminder.setVisibility(View.GONE);
+        }
+        if (movie.isWishlisted()){
+            holder.movieListItemBinding.ivWishlist.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.movieListItemBinding.ivWishlist.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -56,7 +68,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         public MovieViewHolder(MovieListItemBinding movieListItemBinding) {
             super(movieListItemBinding.getRoot());
             this.movieListItemBinding = movieListItemBinding;
-
             movieListItemBinding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -69,12 +80,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                     }
                 }
             });
-
-
-
-
-
-
         }
     }
 }

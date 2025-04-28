@@ -8,6 +8,10 @@ import androidx.lifecycle.LiveData;
 
 import com.rkdigital.filmfolio.model.Movie;
 import com.rkdigital.filmfolio.model.MovieRepository;
+import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.model.ReminderRepository;
+import com.rkdigital.filmfolio.model.Wishlist;
+import com.rkdigital.filmfolio.model.WishlistRepository;
 
 import java.util.List;
 
@@ -15,9 +19,14 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     private MovieRepository repository;
     private String currentSearchQuery = null;
-    public MainActivityViewModel(@NonNull Application application) {
+    private ReminderRepository reminderRepository;
+    private WishlistRepository wishlistRepository;
+    public MainActivityViewModel(@NonNull Application application,String userId) {
         super(application);
         this.repository = new MovieRepository(application);
+        this.reminderRepository = new ReminderRepository(application, userId);
+        this.wishlistRepository= new WishlistRepository(application,userId);
+
     }
     public LiveData<List<Movie>>getAllMovies(){
         return repository.getMutableLiveData();
@@ -49,5 +58,11 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
 
+    public LiveData<Reminder>getReminderByMovie(int movieId, String userid){
+        return reminderRepository.getReminderForMovie(movieId,userid);
+    }
 
+    public LiveData<Wishlist>getWishlistByMovie(int movieId, String userid){
+        return wishlistRepository.getWishlistForMovie(movieId,userid);
+    }
 }

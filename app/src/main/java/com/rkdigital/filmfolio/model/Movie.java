@@ -55,6 +55,24 @@ public class Movie extends BaseObservable {
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
+    private boolean wishlisted;
+    private boolean reminderSet;
+
+    public boolean isWishlisted() {
+        return wishlisted;
+    }
+
+    public void setWishlisted(boolean wishlisted) {
+        this.wishlisted = wishlisted;
+    }
+
+    public boolean hasReminder() {
+        return reminderSet;
+    }
+
+    public void setReminderSet(boolean reminderSet) {
+        this.reminderSet = reminderSet;
+    }
 
     @BindingAdapter({"posterPath"})
     public static void loadImage(ImageView imageView, String imageUrl){
@@ -107,4 +125,5 @@ public class Movie extends BaseObservable {
     public void setVoteAverage(Double voteAverage) {this.voteAverage = voteAverage;}
     public Integer getVoteCount() {return voteCount;}
     public void setVoteCount(Integer voteCount) {this.voteCount = voteCount;}
+
 }
