@@ -7,11 +7,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.rkdigital.filmfolio.model.Movie;
-import com.rkdigital.filmfolio.model.MovieRepository;
+import com.rkdigital.filmfolio.repository.MovieRepository;
 import com.rkdigital.filmfolio.model.Reminder;
-import com.rkdigital.filmfolio.model.ReminderRepository;
+import com.rkdigital.filmfolio.repository.ReminderRepository;
 import com.rkdigital.filmfolio.model.Wishlist;
-import com.rkdigital.filmfolio.model.WishlistRepository;
+import com.rkdigital.filmfolio.repository.WishlistRepository;
 
 import java.util.List;
 

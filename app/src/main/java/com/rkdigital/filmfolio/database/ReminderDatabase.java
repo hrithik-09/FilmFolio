@@ -1,10 +1,13 @@
-package com.rkdigital.filmfolio.model;
+package com.rkdigital.filmfolio.database;
 
 import android.content.Context;
 
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+
+import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.dao.ReminderDAO;
 
 @Database(entities = {Reminder.class},version = 1)
 public abstract class ReminderDatabase extends RoomDatabase {

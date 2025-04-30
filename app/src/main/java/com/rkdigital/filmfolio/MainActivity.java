@@ -39,6 +39,8 @@ import com.rkdigital.filmfolio.viewmodel.MainActivityViewModel;
 import com.rkdigital.filmfolio.viewmodel.MainActivityViewModelFactory;
 import com.rkdigital.filmfolio.viewmodel.ReminderViewModel;
 import com.rkdigital.filmfolio.viewmodel.ReminderViewModelFactory;
+import com.rkdigital.filmfolio.viewmodel.WishlistViewModel;
+import com.rkdigital.filmfolio.viewmodel.WishlistViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +56,11 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
     private boolean doubleBackToExitPressedOnce=false;
-    private TextView userName,logoutButton;
+    private TextView userName,logoutButton,wishlist;
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
     private ReminderViewModel reminderViewModel;
+    private WishlistViewModel wishlistViewModel;
 
     private boolean[] selectedFilters;
     private ArrayList<String> chosenFilters = new ArrayList<>();
@@ -81,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
         initUI();
 
         getMovies();
+
+        WishlistViewModelFactory factory1 = new WishlistViewModelFactory(getApplication(),sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1"));
+        wishlistViewModel = new ViewModelProvider(this,factory1).get(WishlistViewModel.class);
 
         ReminderViewModelFactory factory = new ReminderViewModelFactory(getApplication(), sharedPreferencesHelper.getString(sharedPreferencesHelper.getUserPrefs(),SharedPrefsKeys.USER_ID,"-1"));
         reminderViewModel = new ViewModelProvider(this, factory).get(ReminderViewModel.class);
@@ -134,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.openDrawer(GravityCompat.START);
 
         });
+        wishlist.setOnClickListener(view -> startActivity(new Intent(this,WishlistActivity.class)));
 
         logoutButton.setOnClickListener(view -> logout());
 
@@ -144,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         ivSearch = findViewById(R.id.ivSearch);
         logoutButton = findViewById(R.id.logout);
         filterIcon =  findViewById(R.id.ivFilter);
+        wishlist = findViewById(R.id.wishlist);
         filterOptions = getResources().getStringArray(R.array.filter_options);
         selectedFilters = new boolean[filterOptions.length];
         toggle=findViewById(R.id.ivHamburger);
@@ -158,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Clear Google sign-in state
         CredentialManager credentialManager = CredentialManager.create(getApplicationContext());
-        ClearCredentialStateRequest clearRequest = new ClearCredentialStateRequest(); // ✅ No need for token
+        ClearCredentialStateRequest clearRequest = new ClearCredentialStateRequest();
         CancellationSignal cancellationSignal = new CancellationSignal();
 
         credentialManager.clearCredentialStateAsync(
@@ -186,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
         // stop sync listener
         reminderViewModel.clearReminderListener();
         reminderViewModel.clearLocalReminder();
+        wishlistViewModel.clearLocalWishlist();
 
         //  Navigate to Login
         Intent intent = new Intent(this, LoginScreen.class);

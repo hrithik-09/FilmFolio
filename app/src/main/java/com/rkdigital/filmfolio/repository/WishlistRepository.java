@@ -1,15 +1,18 @@
-package com.rkdigital.filmfolio.model;
+package com.rkdigital.filmfolio.repository;
 
 import android.app.Application;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import com.rkdigital.filmfolio.model.Wishlist;
+import com.rkdigital.filmfolio.dao.WishlistDAO;
+import com.rkdigital.filmfolio.database.WishlistDatabase;
 import com.rkdigital.filmfolio.storage.FirebaseWishlistHelper;
 
 import java.util.List;
@@ -22,7 +25,7 @@ public class WishlistRepository {
     ExecutorService executor;
     Handler handler;
     private ListenerRegistration firebaseListener;
-    private final String currentUserId; // Store the current userId
+    private final String currentUserId;
 
     private final Application application;
     public WishlistRepository(Application application,String userId) {
@@ -89,6 +92,7 @@ public class WishlistRepository {
     }
 
     public LiveData<List<Wishlist>> getWishlistByUser(String userId) {
+        Log.d("WishlistDAO", "Querying wishlist for user: " + userId);
         return wishlistDAO.getWishlistByUser(userId);
     }
 
@@ -101,4 +105,6 @@ public class WishlistRepository {
             wishlistDAO.deleteAllWishlist();
         });
     }
+
+
 }

@@ -188,6 +188,16 @@
                     android:paddingBottom="16dp"/>
 
 
+                <!-- Account Settings -->
+                <TextView
+                    android:id="@+id/wishlist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="My Wishlist"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:paddingBottom="16dp"/>
+
 
                 <!-- Logout Option -->
                 <TextView

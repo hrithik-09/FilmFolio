@@ -2,6 +2,7 @@ package com.rkdigital.filmfolio.serviceapi;
 
 import com.rkdigital.filmfolio.model.MovieDetail;
 import com.rkdigital.filmfolio.model.Result;
+import com.rkdigital.filmfolio.model.WishlistMovie;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -38,5 +39,11 @@ public interface MovieApiService {
             @Query("append_to_response") String extra
     );
 
+    @GET("movie/{movie_id}")
+    Call<WishlistMovie>getMovieWishlistDetails(
+            @Path("movie_id") int movieId,
+            @Query("api_key") String apiKey,
+            @Query("append_to_response") String extra
+    );
 
 }

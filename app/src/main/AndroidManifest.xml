@@ -36,7 +36,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".wishlist"
+            android:name=".WishlistActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.rkdigital.filmfolio.model.Reminder;
-import com.rkdigital.filmfolio.model.ReminderRepository;
+import com.rkdigital.filmfolio.repository.ReminderRepository;
 
 import java.util.List;
 

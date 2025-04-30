@@ -1,4 +1,4 @@
-package com.rkdigital.filmfolio.model;
+package com.rkdigital.filmfolio.repository;
 
 import android.app.Application;
 import android.text.TextUtils;
@@ -8,6 +8,10 @@ import android.util.Pair;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.rkdigital.filmfolio.model.Movie;
+import com.rkdigital.filmfolio.model.MovieDetail;
+import com.rkdigital.filmfolio.model.Result;
+import com.rkdigital.filmfolio.model.WishlistMovie;
 import com.rkdigital.filmfolio.storage.SharedPreferencesHelper;
 import com.rkdigital.filmfolio.R;
 import com.rkdigital.filmfolio.serviceapi.MovieApiService;
@@ -218,6 +222,29 @@ public class MovieRepository {
         });
 
         return movieDetailLiveData;
+    }
+
+    public LiveData<WishlistMovie> getWishlistMovieDetails(int movieId)
+    {
+        MutableLiveData<WishlistMovie> wishlistMovieMutableLiveData = new MutableLiveData<>();
+        MovieApiService apiService = RetrofitInstance.getService();
+        apiService.getMovieWishlistDetails(movieId, application.getString(R.string.api_key), "credits").enqueue(new Callback<WishlistMovie>() {
+            @Override
+            public void onResponse(Call<WishlistMovie> call, Response<WishlistMovie> response) {
+                if (response.isSuccessful()) {
+                    wishlistMovieMutableLiveData.setValue(response.body());
+                } else {
+                    wishlistMovieMutableLiveData.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WishlistMovie> call, Throwable t) {
+                wishlistMovieMutableLiveData.setValue(null);
+            }
+        });
+
+        return wishlistMovieMutableLiveData;
     }
 
 }

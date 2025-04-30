@@ -8,8 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.rkdigital.filmfolio.model.MovieDetail;
-import com.rkdigital.filmfolio.model.MovieRepository;
-import com.rkdigital.filmfolio.serviceapi.RetrofitInstance;
+import com.rkdigital.filmfolio.repository.MovieRepository;
 
 public class MovieAboutViewModel extends AndroidViewModel {
 

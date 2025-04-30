@@ -1,4 +1,4 @@
-package com.rkdigital.filmfolio.model;
+package com.rkdigital.filmfolio.repository;
 
 import android.app.Application;
 import android.content.Context;
@@ -9,6 +9,9 @@ import androidx.lifecycle.LiveData;
 
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.dao.ReminderDAO;
+import com.rkdigital.filmfolio.database.ReminderDatabase;
 import com.rkdigital.filmfolio.reminder.ReminderScheduler;
 import com.rkdigital.filmfolio.storage.FirebaseReminderHelper;
 

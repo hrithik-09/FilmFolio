@@ -5,21 +5,28 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
-import com.rkdigital.filmfolio.model.Movie;
-import com.rkdigital.filmfolio.model.MovieRepository;
-import com.rkdigital.filmfolio.model.Reminder;
+import com.rkdigital.filmfolio.repository.MovieRepository;
 import com.rkdigital.filmfolio.model.Wishlist;
-import com.rkdigital.filmfolio.model.WishlistRepository;
+import com.rkdigital.filmfolio.model.WishlistMovie;
+import com.rkdigital.filmfolio.repository.WishlistRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WishlistViewModel extends AndroidViewModel {
     private WishlistRepository wishlistRepository;
+    private final MovieRepository movieRepository;
+    private MutableLiveData<WishlistMovie> movieDetailLiveData;
+    private final Map<Integer, LiveData<WishlistMovie>> movieCache = new HashMap<>();
 
     public WishlistViewModel(@NonNull Application application,String userId) {
         super(application);
         this.wishlistRepository = new WishlistRepository(application,userId);
+        this.movieRepository = new MovieRepository(application);
     }
 
     public LiveData<List<Wishlist>>getWishlistByUser(String userId)
@@ -40,5 +47,24 @@ public class WishlistViewModel extends AndroidViewModel {
     }
     public void clearLocalWishlist(){
         wishlistRepository.clearLocalWishlist();
+    }
+
+    public LiveData<WishlistMovie> getMovieDetails(int movieId) {
+        if (!movieCache.containsKey(movieId)) {
+            MutableLiveData<WishlistMovie> liveData = new MutableLiveData<>();
+            movieCache.put(movieId, liveData);
+            fetchMovieDetails(movieId, liveData);
+        }
+        return movieCache.get(movieId);
+    }
+
+    private void fetchMovieDetails(int movieId, MutableLiveData<WishlistMovie> liveData) {
+        movieRepository.getWishlistMovieDetails(movieId).observeForever(new Observer<WishlistMovie>() {
+            @Override
+            public void onChanged(WishlistMovie movie) {
+                liveData.setValue(movie);
+                movieRepository.getWishlistMovieDetails(movieId).removeObserver(this);
+            }
+        });
     }
 }
